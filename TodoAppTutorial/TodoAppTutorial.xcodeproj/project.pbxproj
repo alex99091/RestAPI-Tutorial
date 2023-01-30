@@ -13,6 +13,8 @@
 		26ADCC522987D8990063757C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC512987D8990063757C /* Preview Assets.xcassets */; };
 		26ADCC5A2987DA2C0063757C /* MainVC.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC592987DA2C0063757C /* MainVC.storyboard */; };
 		26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC5B2987DA4C0063757C /* MainVC.swift */; };
+		26ADCC5E298869740063757C /* TodoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC5D298869740063757C /* TodoCell.xib */; };
+		26ADCC6029886E8E0063757C /* TodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC5F29886E8E0063757C /* TodoCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,8 @@
 		26ADCC512987D8990063757C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		26ADCC592987DA2C0063757C /* MainVC.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainVC.storyboard; sourceTree = "<group>"; };
 		26ADCC5B2987DA4C0063757C /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
+		26ADCC5D298869740063757C /* TodoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TodoCell.xib; sourceTree = "<group>"; };
+		26ADCC5F29886E8E0063757C /* TodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +81,8 @@
 			children = (
 				26ADCC592987DA2C0063757C /* MainVC.storyboard */,
 				26ADCC5B2987DA4C0063757C /* MainVC.swift */,
+				26ADCC5D298869740063757C /* TodoCell.xib */,
+				26ADCC5F29886E8E0063757C /* TodoCell.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -142,6 +148,7 @@
 				26ADCC5A2987DA2C0063757C /* MainVC.storyboard in Resources */,
 				26ADCC522987D8990063757C /* Preview Assets.xcassets in Resources */,
 				26ADCC4F2987D8990063757C /* Assets.xcassets in Resources */,
+				26ADCC5E298869740063757C /* TodoCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +162,7 @@
 				26ADCC4D2987D8940063757C /* ContentView.swift in Sources */,
 				26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */,
 				26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */,
+				26ADCC6029886E8E0063757C /* TodoCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
