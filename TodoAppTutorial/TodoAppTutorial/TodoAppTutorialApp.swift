@@ -13,7 +13,7 @@ struct TodoAppTutorialApp: App {
         WindowGroup {
             TabView{
                 // SwiftUI View
-                ContentView()
+                TodosView()
                     .tabItem {
                         Image(systemName: "1.square.fill")
                         Text("SwiftUI")
