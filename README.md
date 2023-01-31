@@ -72,6 +72,7 @@ func fetchWebData(completion: @escaping (Result<[ModelObject], Error>) -> ()) {
 }
 ```
 - Get request를 사용하여 URLSession을 가져오기 
+
 `URLSession.shared`는 URLSession에서 기본적인 네트워크를 구성하는 `singleton`(객채의 인스턴스가 오직 1개만 생성되는)패턴
 
 ```swift 
