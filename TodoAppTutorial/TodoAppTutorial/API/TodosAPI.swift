@@ -37,7 +37,7 @@ enum TodosAPI {
         }
     }
     
-    static func fetchTodos(page: Int = 1, completion: @escaping(Result<TodosResponse, ApiError>) -> Void) {
+    static func fetchTodos(page: Int = 1, completion: @escaping(Result<BaseListResponse<Todo>, ApiError>) -> Void) {
         // 1. urlRequest를 만든다
         let urlString = baseURL + "/todos" + "?page=\(page)"
         let url = URL(string: urlString)!
@@ -78,9 +78,9 @@ enum TodosAPI {
                 // convert data to our swift model
                 do {
                     // JSON -> Struct로 변경 즉 디코딩(data parsing)
-                    let todosResponse = try JSONDecoder().decode(TodosResponse.self, from: jsonData)
-                    let todos = todosResponse.data
-                    print("todosResponse: \(todosResponse)")
+                    let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: jsonData)
+                    let todos = listResponse.data
+                    print("todosResponse: \(listResponse)")
                     
                     // 상태코드는 200 대인데 파싱한 데이터에 따라서 달라지는 에러처리
                     guard let todos = todos,
@@ -88,7 +88,7 @@ enum TodosAPI {
                         return completion(.failure(ApiError.noContent))
                     }
                     
-                    completion(.success(todosResponse))
+                    completion(.success(listResponse))
                 } catch {
                     // decoding error
                     completion(.failure(ApiError.decodingError))

@@ -15,6 +15,13 @@ struct TodosResponse: Decodable {
     let message: String?
 }
 
+// 제너릭 응답처리
+struct BaseListResponse<T: Codable>: Codable {
+    let data: [T]?
+    let meta: Meta?
+    let message: String?
+}
+
 // MARK: - Datum
 struct Todo: Codable {
     let id: Int?
