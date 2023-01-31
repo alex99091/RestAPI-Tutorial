@@ -13,15 +13,35 @@ class TodosVM: ObservableObject {
     
     init() {
         print(#fileID, #function, #line, "- "    )
-        TodosAPI.fetchTodos { result in
+        TodosAPI.fetchTodos { [weak self] result in
+            
+            guard let self = self else { return }
+            
             switch result {
             case .success(let todosResponse):
                 print("TodosVM - todosResponse: \(todosResponse)")
             case .failure(let failure):
                 print("TodosVM - failure: \(failure)")
+                self.handleError(error: failure)
             }
             
         }
     }// init
+    
+    // - Parameter error: API에러
+    fileprivate func handleError(error: Error) {
+        if error is TodosAPI.ApiError {
+            let apiError = error as! TodosAPI.ApiError
+            print("handleError: error = \(apiError.info)")
+            switch apiError {
+            case .noContent:
+                print("컨텐츠가 없습니다.")
+            case .unAuthorized:
+                print("인증되지 않았습니다.")
+            default:
+                print("default")
+            }
+        }
+    }// handleError
     
 }
