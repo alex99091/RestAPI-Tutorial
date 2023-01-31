@@ -13,16 +13,28 @@ class TodosVM: ObservableObject {
     
     init() {
         print(#fileID, #function, #line, "- "    )
-        TodosAPI.editTodo(id: 2250, title: "오늘도 빡코딩?- 0423", isDone: true, completion: { [weak self] result in
+        TodosAPI.deleteATodo(id: 2248, completion: { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let aTodoResponse):
-                print("TodosVM addATodo - aTodoResponse: \(aTodoResponse)")
+                print("TodosVM deleteATodo - aTodoResponse: \(aTodoResponse)")
             case .failure(let failure):
-                print("TodosVM addATodo - failure: \(failure)")
+                print("TodosVM deleteATodo - failure: \(failure)")
                 self.handleError(error: failure)
             }
         })
+        
+        
+        //        TodosAPI.editTodo(id: 2250, title: "오늘도 빡코딩?- 0423", isDone: true, completion: { [weak self] result in
+        //            guard let self = self else { return }
+        //            switch result {
+        //            case .success(let aTodoResponse):
+        //                print("TodosVM addATodo - aTodoResponse: \(aTodoResponse)")
+        //            case .failure(let failure):
+        //                print("TodosVM addATodo - failure: \(failure)")
+        //                self.handleError(error: failure)
+        //            }
+        //        })
         
         
         //        TodosAPI.searchTodos(searchTerm: "빡코딩") { [weak self] result in
