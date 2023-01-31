@@ -68,7 +68,7 @@ Refernce link: https://github.com/alexpaul/UIKit/blob/main/URLSession-Cheatsheet
 
 ```swift 
 func fetchWebData(completion: @escaping (Result<[ModelObject], Error>) -> ()) {
- // netowrking code here
+ // networking code here
 }
 ```
 - Get request를 사용하여 URLSession을 가져오기 
