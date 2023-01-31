@@ -13,19 +13,41 @@ class TodosVM: ObservableObject {
     
     init() {
         print(#fileID, #function, #line, "- "    )
-        TodosAPI.fetchTodos { [weak self] result in
-            
+        
+        TodosAPI.searchTodos(searchTerm: "빡코딩") { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let todosResponse):
-                print("TodosVM - todosResponse: \(todosResponse)")
+                print("TodosVM - search todosResponse: \(todosResponse)")
             case .failure(let failure):
                 print("TodosVM - failure: \(failure)")
                 self.handleError(error: failure)
             }
-            
         }
+        
+        //        TodosAPI.fetchATodo(id: 1500, completion: { [weak self] result in
+        //            guard let self = self else { return }
+        //            switch result {
+        //            case .success(let aTodoResponse):
+        //                print("TodosVM - aTodoResponse: \(aTodoResponse)")
+        //            case .failure(let failure):
+        //                print("TodosVM - failure: \(failure)")
+        //                self.handleError(error: failure)
+        //            }
+        //        })
+        
+        //        TodosAPI.fetchTodos { [weak self] result in
+        //            guard let self = self else { return }
+        //
+        //            switch result {
+        //            case .success(let todosResponse):
+        //                print("TodosVM - todosResponse: \(todosResponse)")
+        //            case .failure(let failure):
+        //                print("TodosVM - failure: \(failure)")
+        //                self.handleError(error: failure)
+        //            }
+        //        }
     }// init
     
     // - Parameter error: API에러

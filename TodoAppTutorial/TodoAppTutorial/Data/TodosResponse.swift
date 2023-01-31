@@ -22,6 +22,13 @@ struct BaseListResponse<T: Codable>: Codable {
     let message: String?
 }
 
+// 제너릭 응답처리
+struct BaseResponse<T: Codable>: Codable {
+    let data: T?
+    let message: String?
+//    let code: String?
+}
+
 // MARK: - Datum
 struct Todo: Codable {
     let id: Int?
