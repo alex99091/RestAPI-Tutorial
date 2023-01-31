@@ -8,12 +8,12 @@
 import Foundation
 import Combine
 
-// ObserverbaleObject를 선언해요 변경에 대한 감지가 가능
+// ObserverbaleObject를 선언 하면 변경에 대한 감지가 가능
 class TodosVM: ObservableObject {
     
     init() {
         print(#fileID, #function, #line, "- "    )
-        TodosAPI.addATodo(title: "오늘도 빡코딩?", isDone: true, completion: { [weak self] result in
+        TodosAPI.editTodoJson(id: 2250, title: "오늘도 빡코딩? - 수정해보기", isDone: true, completion: { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let aTodoResponse):
