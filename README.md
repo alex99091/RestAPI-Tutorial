@@ -106,7 +106,7 @@ do {
 
 - Codable 프로토콜을 사용해서 JSON을 모델로 파싱하기 
 
-여기서 Codable이란 Decodable(Json에서 디코딩)과 Encodable(Json으로 인코딩)프로토콜을 준수하는 타입(프로토콜)이다.
+여기서 Codable이란 Decodable(Json -> Struct/Class)과 Encodable(Struct/Class -> Json)프로토콜을 준수하는 타입(프로토콜)이다.
 
 ```swift 
 struct CovidCountriesWrapper: Codable {
