@@ -19,6 +19,9 @@
 		26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC5B2987DA4C0063757C /* MainVC.swift */; };
 		26ADCC5E298869740063757C /* TodoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC5D298869740063757C /* TodoCell.xib */; };
 		26ADCC6029886E8E0063757C /* TodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC5F29886E8E0063757C /* TodoCell.swift */; };
+		26E13C982988E0AF0039112E /* TodosAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13C972988E0AF0039112E /* TodosAPI.swift */; };
+		26E13C9A298934200039112E /* TodosVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13C99298934200039112E /* TodosVM.swift */; };
+		26E13C9D2989377C0039112E /* TodosResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13C9C2989377C0039112E /* TodosResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +38,9 @@
 		26ADCC5B2987DA4C0063757C /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		26ADCC5D298869740063757C /* TodoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TodoCell.xib; sourceTree = "<group>"; };
 		26ADCC5F29886E8E0063757C /* TodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoCell.swift; sourceTree = "<group>"; };
+		26E13C972988E0AF0039112E /* TodosAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodosAPI.swift; sourceTree = "<group>"; };
+		26E13C99298934200039112E /* TodosVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodosVM.swift; sourceTree = "<group>"; };
+		26E13C9C2989377C0039112E /* TodosResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodosResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +65,9 @@
 		260EAE27298886D700610EA1 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				260EAE212988786300610EA1 /* TodosView.swift */,
+				26ADCC4C2987D8940063757C /* ContentView.swift */,
+				260EAE2A298888AC00610EA1 /* TodoRow.swift */,
 				260EAE282988871000610EA1 /* UISearchBarwrapper.swift */,
 			);
 			path = SwiftUI;
@@ -83,15 +92,15 @@
 		26ADCC492987D8930063757C /* TodoAppTutorial */ = {
 			isa = PBXGroup;
 			children = (
+				26E13C9B298937610039112E /* Data */,
+				26E13C962988E0860039112E /* API */,
 				260EAE27298886D700610EA1 /* SwiftUI */,
 				26ADCC582987D9BB0063757C /* UIKit */,
 				260EAE242988823800610EA1 /* Styles */,
-				260EAE212988786300610EA1 /* TodosView.swift */,
 				26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */,
-				26ADCC4C2987D8940063757C /* ContentView.swift */,
+				26E13C99298934200039112E /* TodosVM.swift */,
 				26ADCC4E2987D8990063757C /* Assets.xcassets */,
 				26ADCC502987D8990063757C /* Preview Content */,
-				260EAE2A298888AC00610EA1 /* TodoRow.swift */,
 			);
 			path = TodoAppTutorial;
 			sourceTree = "<group>";
@@ -113,6 +122,22 @@
 				26ADCC5F29886E8E0063757C /* TodoCell.swift */,
 			);
 			path = UIKit;
+			sourceTree = "<group>";
+		};
+		26E13C962988E0860039112E /* API */ = {
+			isa = PBXGroup;
+			children = (
+				26E13C972988E0AF0039112E /* TodosAPI.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		26E13C9B298937610039112E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				26E13C9C2989377C0039112E /* TodosResponse.swift */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,9 +212,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26E13C982988E0AF0039112E /* TodosAPI.swift in Sources */,
 				260EAE222988786300610EA1 /* TodosView.swift in Sources */,
 				260EAE292988871000610EA1 /* UISearchBarwrapper.swift in Sources */,
+				26E13C9D2989377C0039112E /* TodosResponse.swift in Sources */,
 				26ADCC4D2987D8940063757C /* ContentView.swift in Sources */,
+				26E13C9A298934200039112E /* TodosVM.swift in Sources */,
 				26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */,
 				260EAE262988826300610EA1 /* Button+Style.swift in Sources */,
 				26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */,
