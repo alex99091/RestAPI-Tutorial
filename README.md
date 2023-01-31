@@ -64,6 +64,9 @@ output ->
 Refernce link: https://github.com/alexpaul/UIKit/blob/main/URLSession-Cheatsheet.md
 
 - Asynchronous network request 의 결과를 가져오기 
+
+Asynchronous: Closure, Rx Observable, Combine Publisher, Async await 
+
 `Result`타입은 `success`와 `failure`을 가지고있는 `enum` 타입으로 정의
 
 ```swift 
