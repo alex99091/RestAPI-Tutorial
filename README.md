@@ -60,5 +60,131 @@ output ->
 {"currentCount":1,"data":[{"기종":"A21N","도착공항":"TAE","도착시간":"09:00","시작일자":"2022-03-28","운항요일":"월화수목금토일","종료일자":"2022-10-29","출발공항":"CJU","출발시간":"07:55","편명":"OZ8120","항공사":"AAR"}],"matchCount":1110,"page":1,"perPage":1,"totalCount":1110}
 ```
 
-#### Web/ App Service
+#### URL Session
+
+- Asynchronous network request 의 결과를 가져오기 
+`Result`타입은 `success`와 `failure`을 가지고있는 `enum` 타입으로 정의
+
+```swift 
+func fetchWebData(completion: @escaping (Result<[ModelObject], Error>) -> ()) {
+ // netowrking code here
+}
+```
+- Get request를 사용하여 URLSession을 가져오기 
+`URLSession.shared`는 URLSession에서 기본적인 네트워크를 구성하는 `singleton`(객채의 인스턴스가 오직 1개만 생성되는)패턴
+
+```swift 
+let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+  // networking code here
+}
+dataTask.resume()
+```
+
+- `HTTPURLResponse` 상태 코드가 유효한 범주내에 있는지 확인하기 
+```swift 
+guard let httpResponse = response as? HTTPURLResponse,
+      (200...299).contains(httpResponse.statusCode) else {
+  print("bad status code")
+  return
+}
+```
+
+- JSON 데이터를 JSONDecoder를 사용해서 변환하기
+```swift 
+do {
+  let topLevelModel = try JSONDecoder().decode(TopLevelModel.self, from: jsonData)
+  let modelObjects = topLevelModel.modelObjects
+  completion(.success(modelObjects)
+} catch {
+  // decoding error
+  completion(.failure(error))
+}
+```
+
+- Codable 프로토콜을 사용해서 JSON을 모델로 파싱하기 
+여기서 Codable이란 Decodable(Json에서 디코딩)과 Encodable(Json으로 인코딩)프로토콜을 준수하는 타입(프로토콜)이다.
+
+```swift 
+struct CovidCountriesWrapper: Codable {
+  let countries: [CountrySummary]
+  
+  // CodingKeys allows us to rename properties
+  enum CodingKeys: String, CodingKey {
+    case countries = "Countries"
+  }
+}
+
+struct CountrySummary: Codable {
+  let country: String
+  let totalConfirmed: Int
+  let totalRecovered: Int
+  
+  enum CodingKeys: String, CodingKey {
+    case country = "Country"
+    case totalConfirmed = "TotalConfirmed"
+    case totalRecovered = "TotalRecovered"
+  }
+}
+```
+
+-  `enum`에 명시된 `CodingKeys`로 JSON property name과 own name을 매칭하기 
+아래 예는 Contries를 일반적인 swift 이름으로 변환하는 코드이다.
+
+```swift 
+struct CovidCountriesWrapper: Codable {
+  let countries: [CountrySummary]
+  
+  // CodingKeys allows us to rename properties
+  enum CodingKeys: String, CodingKey {
+    case countries = "Countries"
+  }
+}
+```
+
+- 웹 데이터를 가져오기 위한 API Client 구성하기 
+
+```swift 
+ func fetchWebData(completion: @escaping (Result<[ModelObject], Error>) -> ()) {
+    // 1. - endpoint URL string
+    let endpointURLString = "https://........"
+    
+    // 2. - convert the string to an URL
+    guard let url = URL(string: endpointURLString) else {
+      print("bad url")
+      return
+    }
+    
+    // URL vs URLRequest
+    
+    // 3. - make the request using URLSession
+    // .shared is an singleton instance on URLSession comes with basic configuration needed for most requests
+    let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+      if let error = error {
+        return completion(.failure(error))
+      }
+      
+      // first we have to type cast URLResponse to HTTPURLRepsonse to get access to the status code
+      // we verify the that status code is in the 200 range which signals all went well with the GET request
+      guard let httpResponse = response as? HTTPURLResponse,
+            (200...299).contains(httpResponse.statusCode) else {
+        print("bad status code")
+        return
+      }
+      
+      if let jsonData = data {
+        // convert data to our swift model
+        do {
+          let topLevelModel = try JSONDecoder().decode(TopLevelModel.self, from: jsonData)
+          let modelObjects = topLevelModel.modelObjects
+          completion(.success(modelObjects))
+        } catch {
+          // decoding error
+          completion(.failure(error))
+        }
+      }
+    }
+    dataTask.resume()
+  }
+```
+
 #### Alamofire 
