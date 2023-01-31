@@ -25,6 +25,7 @@
 		26E13CA0298979CD0039112E /* URL+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13C9F298979CD0039112E /* URL+Ext.swift */; };
 		26E13CA329897D370039112E /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 26E13CA229897D370039112E /* MultipartForm */; };
 		26E13CA52989A1490039112E /* URLRequest+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13CA42989A1490039112E /* URLRequest+Ext.swift */; };
+		26E13CA72989A5E80039112E /* TodosAPI+Closure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		26E13C9C2989377C0039112E /* TodosResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodosResponse.swift; sourceTree = "<group>"; };
 		26E13C9F298979CD0039112E /* URL+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Ext.swift"; sourceTree = "<group>"; };
 		26E13CA42989A1490039112E /* URLRequest+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Ext.swift"; sourceTree = "<group>"; };
+		26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Closure.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				26E13C972988E0AF0039112E /* TodosAPI.swift */,
+				26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -240,6 +243,7 @@
 				26E13C9D2989377C0039112E /* TodosResponse.swift in Sources */,
 				26E13CA52989A1490039112E /* URLRequest+Ext.swift in Sources */,
 				26ADCC4D2987D8940063757C /* ContentView.swift in Sources */,
+				26E13CA72989A5E80039112E /* TodosAPI+Closure.swift in Sources */,
 				26E13C9A298934200039112E /* TodosVM.swift in Sources */,
 				26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */,
 				26E13CA0298979CD0039112E /* URL+Ext.swift in Sources */,
