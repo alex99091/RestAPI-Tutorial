@@ -641,62 +641,43 @@ extension TodosAPI {
         return Observable.merge(apiCallObservables).compactMap{ $0 }
     }
     
-    /// 클로져 기반 api 동시 처리
+    /// RX 기반 api 동시 처리 - Zip
     /// 선택된 할일들 가져오기
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosWithObservable(selectedTodoIds: [Int],
-                                                 completion: @escaping (Result<[Todo], ApiError>) -> Void){
+    static func fetchSelectedTodosWithObservable(selectedTodoIds: [Int]) -> Observable<[Todo]> {
         
-        let group = DispatchGroup()
+        // 1. 매개변수 배열 -> Observable 스트림 배열
         
-        // 가져온 할일들
-        var fetchedTodos : [Todo] = [Todo]()
-        
-        // 에러들
-        var apiErrors : [ApiError] = []
-        
-        // 응답 결과들
-        var apiResults = [Int : Result<BaseResponse<Todo>, ApiError>]()
-        
-        
-        selectedTodoIds.forEach { aTodoId in
-            
-            // 디스패치 그룹에 넣음
-            group.enter()
-            
-            self.fetchATodo(id: aTodoId,
-                            completion: { result in
-                switch result {
-                case .success(let response):
-                    // 가져온 할일을 가져온 할일 배열에 넣는다
-                    if let todo = response.data {
-                        fetchedTodos.append(todo)
-                        print("inner fetchATodo - success: \(todo)")
-                    }
-                case .failure(let failure):
-                    apiErrors.append(failure)
-                    print("inner fetchATodo - failure: \(failure)")
-                }
-                group.leave()
-            })// 단일 할일 조회 API 호출
+        // 2. 배열로 단일 api 호출
+        let apiCallObservables = selectedTodoIds.map { id -> Observable<Todo?> in
+            return self.fetchATodoWithObservable(id: id)
+                .map{ $0.data } // Todo?
+                .catchAndReturn(nil)
         }
         
-        // Configure a completion callback
-        group.notify(queue: .main) {
-            // All requests completed
-            print("모든 api 완료 됨")
-            
-            // 만약 에러가 있다면 에러 올려주기
-            if !apiErrors.isEmpty {
-                if let firstError = apiErrors.first {
-                    completion(.failure(firstError))
-                    return
-                }
-            }
-            
-            completion(.success(fetchedTodos))
+        // Observable<[Todo?]> -> 'compactmap 사용' Observable<[Todo]>
+        return Observable.zip(apiCallObservables).map { $0.compactMap{ $0 }}
+    }
+    
+    /// RX 기반 api 동시 처리 - Merge
+    /// 선택된 할일들 가져오기
+    /// - Parameters:
+    ///   - selectedTodoIds: 선택된 할일 아이디들
+    ///   - completion: 응답 결과
+    static func fetchSelectedTodosWithObservableMerge(selectedTodoIds: [Int]) -> Observable<Todo> {
+        
+        // 1. 매개변수 배열 -> Observable 스트림 배열
+        
+        // 2. 배열로 단일 api 호출
+        let apiCallObservables = selectedTodoIds.map { id -> Observable<Todo?> in
+            return self.fetchATodoWithObservable(id: id)
+                .map{ $0.data } // Todo?
+                .catchAndReturn(nil)
         }
+        
+        // Observable<[Todo?]> -> 'compactmap 사용' Observable<[Todo]>
+        return Observable.merge(apiCallObservables).compactMap{ $0 }
     }
 }
