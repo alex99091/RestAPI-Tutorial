@@ -15,7 +15,7 @@ import RxRelay
 extension TodosAPI {
     
     // 모든 할일 목록 가져오기
-    static func fetchTodosWithObservable(page: Int = 1) -> Observable<Result<BaseListResponse<Todo>, ApiError>> {
+    static func fetchTodosWithObservableResult(page: Int = 1) -> Observable<Result<BaseListResponse<Todo>, ApiError>> {
         // 1. urlRequest를 만든다
         let urlString = baseURL + "/todos" + "?page=\(page)"
         guard let url = URL(string: urlString) else {
@@ -66,6 +66,63 @@ extension TodosAPI {
                 } catch {
                     // decoding error
                     return .failure(ApiError.decodingError)
+                }
+            })
+    }
+    
+    // 모든 할일 목록 가져오기
+    static func fetchTodosWithObservable(page: Int = 1) -> Observable<BaseListResponse<Todo>> {
+        
+        // 1. urlRequest를 만든다
+        let urlString = baseURL + "/todos" + "?page=\(page)"
+        guard let url = URL(string: urlString) else {
+            return Observable.error(ApiError.notAllowedUrl)
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json", forHTTPHeaderField: "accept")
+        
+        // 2. urlSession으로 API를 호출한다
+        // 3. API 호출에 대한 응답을 받는다.
+        return URLSession.shared.rx.response(request: urlRequest)
+            .map({ (urlResponse: HTTPURLResponse, data: Data) -> BaseListResponse<Todo> in
+                
+                print("data: \(data)")
+                print("urlResponse: \(urlResponse)")
+                
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    print("bad status code")
+                    throw ApiError.unknown(nil)
+                }
+                
+                // statusCode에 따른 에러처리
+                switch httpResponse.statusCode {
+                case 401:
+                    throw ApiError.unAuthorized
+                default: print("default")
+                }
+                
+                if !(200...299).contains(httpResponse.statusCode) {
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+                
+                do {
+                    // JSON -> Struct로 변경 즉 디코딩(data parsing)
+                    let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: data)
+                    let todos = listResponse.data
+                    print("todosResponse: \(listResponse)")
+                    
+                    // 상태코드는 200 대인데 파싱한 데이터에 따라서 달라지는 에러처리
+                    guard let todos = todos,
+                          !todos.isEmpty else {
+                        throw ApiError.noContent
+                    }
+                    
+                    return listResponse
+                } catch {
+                    // decoding error
+                    throw ApiError.decodingError
                 }
             })
     }

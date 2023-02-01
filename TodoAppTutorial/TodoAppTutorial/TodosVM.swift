@@ -22,15 +22,28 @@ class TodosVM: ObservableObject {
         
         TodosAPI.fetchTodosWithObservable()
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .failure(let failure):
-                    self.handleError(error: failure)
-                case .success(let reponse):
-                    print("TodosVM - fetchTodosWithObservable: data: \(reponse)")
-                }
+            .compactMap{ $0.data } // [Todo]
+            .catch({ error in
+                print("TodosVM - catch error: \(error)")
+                return Observable.just([])
+            }) // []
+            .subscribe(onNext: { [weak self] (response: [Todo]) in
+                print("TodosVM - fetchTodosWithObservable: response: \(response)")
+            }, onError: { [weak self] failure in
+                self?.handleError(error: failure)
             }).disposed(by: disposeBag)
+        
+//        TodosAPI.fetchTodosWithObservableResult()
+//            .observe(on: MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] result in
+//                guard let self = self else { return }
+//                switch result {
+//                case .failure(let failure):
+//                    self.handleError(error: failure)
+//                case .success(let response):
+//                    print("TodosVM - fetchTodosWithObservable: data: \(response)")
+//                }
+//            }).disposed(by: disposeBag)
         
         
 //        TodosAPI.fetchSelectedTodos(selectedTodoIds: [2250, 2251, 2245], completion: { result in
