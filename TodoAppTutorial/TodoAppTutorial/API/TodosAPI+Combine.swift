@@ -793,18 +793,19 @@ extension TodosAPI {
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosPublisher(selectedTodoIds: [Int]) -> Observable<[Todo]>{
+    static func fetchSelectedTodosPublisher(selectedTodoIds: [Int]) -> AnyPublisher<[Todo], Never>{
         
         //1. 매개변수 배열 -> Observable 스트림 배열
         
         //2. 배열로 단일 api들 호출
-        let apiCallObservables = selectedTodoIds.map { id -> Observable<Todo?> in
-            return self.fetchATodoWithObservable(id: id)
+        let apiCallPublishers = selectedTodoIds.map { id -> AnyPublisher<Todo?, Never> in
+            return self.fetchATodoWithPublisher(id: id)
                 .map{ $0.data } // Todo?
-                .catchAndReturn(nil)
+                .replaceError(with: nil)
+                .eraseToAnyPublisher()
         }
         
-        return Observable.zip(apiCallObservables).map{ $0.compactMap{ $0 } }
+        return apiCallPublishers.zip().map{ $0.compactMap{ $0 } }.eraseToAnyPublisher()
     }
     
     /// Rx 기반 api 동시 처리
@@ -812,17 +813,18 @@ extension TodosAPI {
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosPublisherMerge(selectedTodoIds: [Int]) -> Observable<Todo>{
+    static func fetchSelectedTodosPublisherMerge(selectedTodoIds: [Int]) -> AnyPublisher<Todo, Never>{
         
         //1. 매개변수 배열 -> Observable 스트림 배열
         
         //2. 배열로 단일 api들 호출
-        let apiCallObservables = selectedTodoIds.map { id -> Observable<Todo?> in
-            return self.fetchATodoWithObservable(id: id)
+        let apiCallPublishers = selectedTodoIds.map { id -> AnyPublisher<Todo?, Never> in
+            return self.fetchATodoWithPublisher(id: id)
                 .map{ $0.data } // Todo?
-                .catchAndReturn(nil)
+                .replaceError(with: nil)
+                .eraseToAnyPublisher()
         }
         
-        return Observable.merge(apiCallObservables).compactMap{ $0 }
+        return Publishers.MergeMany(apiCallPublishers).compactMap{ $0 }.eraseToAnyPublisher()
     }
 }
