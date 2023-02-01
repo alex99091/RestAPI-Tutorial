@@ -20,70 +20,11 @@ class TodosVM: ObservableObject {
     init() {
         print(#fileID, #function, #line, "- "    )
         
-        TodosAPI.fetchTodosWithObservable()
+        TodosAPI.addATodoAndFetchTodosWithObservable(title: "오늘도 빡코딩 - 0201 ~~") // [Todo]
             .observe(on: MainScheduler.instance)
-            .compactMap{ $0.data } // [Todo]
-            .catch({ error in
-                print("TodosVM - catch error: \(error)")
-                return Observable.just([])
-            }) // []
             .subscribe(onNext: { [weak self] (response: [Todo]) in
-                print("TodosVM - fetchTodosWithObservable: response: \(response)")
-            }, onError: { [weak self] failure in
-                self?.handleError(error: failure)
+                print("TodoVM - addATodoAndFetchTodoWithObservable: response: \(response)")
             }).disposed(by: disposeBag)
-        
-//        TodosAPI.fetchTodosWithObservableResult()
-//            .observe(on: MainScheduler.instance)
-//            .subscribe(onNext: { [weak self] result in
-//                guard let self = self else { return }
-//                switch result {
-//                case .failure(let failure):
-//                    self.handleError(error: failure)
-//                case .success(let response):
-//                    print("TodosVM - fetchTodosWithObservable: data: \(response)")
-//                }
-//            }).disposed(by: disposeBag)
-        
-        
-//        TodosAPI.fetchSelectedTodos(selectedTodoIds: [2250, 2251, 2245], completion: { result in
-//            switch result {
-//            case .success(let data):
-//                print("TodosVM - fetchSelectedTodos: data: \(data)")
-//            case .failure(let failure):
-//                print("TodosVM - fetchSelectedTodos: failure: \(failure)")
-//            }
-//        })
-        
-//        TodosAPI.deleteSelectedTodos(selectedTodoIds: [2251, 2249, 2247, 2246],
-//                                     completion: { [weak self] deletedTodos in
-//            print("TodosVM deletedTodos - deletedTodos: \(deletedTodos)")
-//        })
-        
-//        TodosAPI.deleteATodo(id: 2252,
-//                             completion: { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//            case .success(let aTodoResponse):
-//                print("TodosVM deleteATodo - deleteATodo: \(aTodoResponse)")
-//            case .failure(let failure):
-//                print("TodosVM todolistResponse - failure: \(failure)")
-//                self.handleError(error: failure)
-//            }
-//        })
-        
-        //        TodosAPI.addTodoAndFetchTodos(
-        //                                    title: "할일추가하고전체보기 123",
-        //                                    completion: { [weak self] result in
-        //            guard let self = self else { return }
-        //            switch result {
-        //            case .success(let todolistResponse):
-        //                print("TodosVM todolistResponse - aTodoResponse: \(todolistResponse.data?.count)")
-        //            case .failure(let failure):
-        //                print("TodosVM todolistResponse - failure: \(failure)")
-        //                self.handleError(error: failure)
-        //            }
-        //        })
         
     }// init
     
