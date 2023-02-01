@@ -17,15 +17,31 @@ class TodosVM: ObservableObject {
     
     var disposeBag = DisposeBag()
     
+    var subscriptions = Set<AnyCancellable>()
+    
     init() {
-        print(#fileID, #function, #line, "- "    )
+        print(#fileID, #function, #line, "- ")
         
-        TodosAPI.deleteSelectedTodosWithObservableMerge(selectedTodoIds: [2267, 2266])
-            .subscribe(onNext: { deletedTodo in
-                print("TodoVM - deleteSelectedTodosWithObservable: deletedTodo: \(deletedTodo)")
-            }, onError: { err in
-                print("TodoVM - deleteSelectedTodosWithObservable: err: \(err)")
-            }).disposed(by: disposeBag)
+        TodosAPI.fetchTodosWithPublisher()
+        .sink(receiveCompletion: { [weak self] completion in
+            guard let self = self else { return }
+            switch completion {
+            case .failure(let failure):
+                self.handleError(error: failure)
+            case .finished:
+                print("TodosVM - finished")
+            }
+        }, receiveValue: { response in
+            print("TodosVM - response: \(response)")
+        })
+        .store(in: &subscriptions)
+        
+//        TodosAPI.deleteSelectedTodosWithObservableMerge(selectedTodoIds: [2267, 2266])
+//            .subscribe(onNext: { deletedTodo in
+//                print("TodoVM - deleteSelectedTodosWithObservable: deletedTodo: \(deletedTodo)")
+//            }, onError: { err in
+//                print("TodoVM - deleteSelectedTodosWithObservable: err: \(err)")
+//            }).disposed(by: disposeBag)
         
         
         //        TodosAPI.deleteSelectedTodosWithObservable(selectedTodoIds: [2265, 2264, 2263, 2262])
@@ -35,11 +51,11 @@ class TodosVM: ObservableObject {
         //                print("TodoVM - deleteSelectedTodosWithObservable: err: \(err)")
         //            }).disposed(by: disposeBag)
         
-        TodosAPI.addATodoAndFetchTodosWithObservable(title: "오늘도 빡코딩 - 0201 ~~") // [Todo]
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] (response: [Todo]) in
-                print("TodoVM - addATodoAndFetchTodoWithObservable: response: \(response)")
-            }).disposed(by: disposeBag)
+//        TodosAPI.addATodoAndFetchTodosWithObservable(title: "오늘도 빡코딩 - 0201 ~~") // [Todo]
+//            .observe(on: MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] (response: [Todo]) in
+//                print("TodoVM - addATodoAndFetchTodoWithObservable: response: \(response)")
+//            }).disposed(by: disposeBag)
         
     }// init
     

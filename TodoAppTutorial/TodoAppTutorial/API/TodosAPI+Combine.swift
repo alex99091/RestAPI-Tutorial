@@ -1,5 +1,5 @@
 //
-//  TodsAPI+Rx.swift
+//  TodsAPI+Combine.swift
 //  TodoAppTutorial
 //
 //  Created by BOONGKI KWAK on 2023/02/01.
@@ -9,18 +9,20 @@ import Foundation
 import MultipartForm
 import RxSwift
 import RxCocoa
+import Combine
 
 extension TodosAPI {
     
     /// 모든 할 일 목록 가져오기
-    static func fetchTodosWithObservableResult(page: Int = 1) -> Observable<Result<BaseListResponse<Todo>, ApiError>>{
+    static func fetchTodosWithPublisherResult(page: Int = 1) ->
+                AnyPublisher<Result<BaseListResponse<Todo>, ApiError>, Never>{
         
         // 1. urlRequest 를 만든다
         
         let urlString = baseURL + "/todos" + "?page=\(page)"
         
         guard let url = URL(string: urlString) else {
-            return Observable.just(.failure(ApiError.notAllowedUrl))
+            return Just(.failure(ApiError.notAllowedUrl)).eraseToAnyPublisher()
         }
         
         var urlRequest = URLRequest(url: url)
@@ -29,13 +31,11 @@ extension TodosAPI {
         
         // 2. urlSession 으로 API를 호출한다
         // 3. API 호출에 대한 응답을 받는다
-        return URLSession.shared.rx
-            .response(request: urlRequest)
-            .map({ (urlResponse: HTTPURLResponse, data: Data) -> Result<BaseListResponse<Todo>, ApiError> in
-                
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .map({ (data: Data, urlResponse: URLResponse) -> Result<BaseListResponse<Todo>, ApiError> in
                 print("data: \(data)")
                 print("urlResponse: \(urlResponse)")
-                
+                     
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
                     print("bad status code")
                     return .failure(ApiError.unknown(nil))
@@ -53,8 +53,8 @@ extension TodosAPI {
                 
                 do {
                     // JSON -> Struct 로 변경 즉 디코딩 즉 데이터 파싱
-                    let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: data)
-                    let todos = listResponse.data
+                  let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: data)
+                  let todos = listResponse.data
                     print("todosResponse: \(listResponse)")
                     
                     // 상태 코드는 200인데 파싱한 데이터에 따라서 에러처리
@@ -65,21 +65,27 @@ extension TodosAPI {
                     
                     return .success(listResponse)
                 } catch {
-                    // decoding error
+                  // decoding error
                     return .failure(ApiError.decodingError)
                 }
             })
+//            .catch({ err in
+//                return Just.failure(ApiError.unknown(nil))
+//            })
+            .replaceError(with: .failure(ApiError.unknown(nil)))
+//            .assertNoFailure() -> 에러가 나지 않는다고 선언 (테스트할 때 사용)
+            .eraseToAnyPublisher()
     }
     
     /// 모든 할 일 목록 가져오기
-    static func fetchTodosWithObservable(page: Int = 1) -> Observable<BaseListResponse<Todo>>{
+    static func fetchTodosWithPublisher(page: Int = 1) -> AnyPublisher<BaseListResponse<Todo>, ApiError>{
         
         // 1. urlRequest 를 만든다
         
         let urlString = baseURL + "/todos" + "?page=\(page)"
         
         guard let url = URL(string: urlString) else {
-            return Observable.error(ApiError.notAllowedUrl)
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
         
         var urlRequest = URLRequest(url: url)
@@ -88,10 +94,8 @@ extension TodosAPI {
         
         // 2. urlSession 으로 API를 호출한다
         // 3. API 호출에 대한 응답을 받는다
-        return URLSession.shared.rx
-            .response(request: urlRequest)
-            .map({ (urlResponse: HTTPURLResponse, data: Data) -> BaseListResponse<Todo> in
-                
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap({ (data: Data, urlResponse: URLResponse) -> Data in
                 print("data: \(data)")
                 print("urlResponse: \(urlResponse)")
                 
@@ -110,28 +114,32 @@ extension TodosAPI {
                     throw ApiError.badStatus(code: httpResponse.statusCode)
                 }
                 
-                do {
-                    // JSON -> Struct 로 변경 즉 디코딩 즉 데이터 파싱
-                    let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: data)
-                    let todos = listResponse.data
-                    print("todosResponse: \(listResponse)")
-                    
-                    // 상태 코드는 200인데 파싱한 데이터에 따라서 에러처리
-                    guard let todos = todos,
-                          !todos.isEmpty else {
-                        throw ApiError.noContent
-                    }
-                    
-                    return listResponse
-                } catch {
-                    // decoding error
-                    throw ApiError.decodingError
-                }
+                return data
             })
+            .decode(type: BaseListResponse<Todo>.self, decoder: JSONDecoder()) //Json -> struct 로 변경 즉 디코딩(데이터파싱)
+            .tryMap({ response in   // 상태코드는 200인데 파싱한 데이터에 따른 에러처리
+                guard let todos = response.data,
+                      !todos.isEmpty else {
+                    throw ApiError.noContent
+                }
+                return response
+            })
+            .mapError({ err -> ApiError in
+                if let error = err as? ApiError { // 기존 api에러라면
+                    return error
+                }
+                
+                if let _ = err as? DecodingError { // decoding에러면
+                    return ApiError.decodingError
+                }
+                
+                return ApiError.unknown(nil)
+            })
+            .eraseToAnyPublisher()
     }
     
     /// 특정 할 일 가져오기
-    static func fetchATodoWithObservable(id: Int) -> Observable<BaseResponse<Todo>>{
+    static func fetchATodoWithPublisher(id: Int) -> Observable<BaseResponse<Todo>>{
         
         // 1. urlRequest 를 만든다
         
@@ -184,7 +192,7 @@ extension TodosAPI {
     }
     
     /// 할 일 검색하기
-    static func searchTodosWithObservable(searchTerm: String, page: Int = 1) -> Observable<BaseListResponse<Todo>>{
+    static func searchTodosWithPublisher(searchTerm: String, page: Int = 1) -> Observable<BaseListResponse<Todo>>{
         
         // 1. urlRequest 를 만든다
         let requestUrl = URL(baseUrl: baseURL + "/todos/search", queryItems: ["query" : searchTerm,
@@ -247,7 +255,7 @@ extension TodosAPI {
     ///   - title: 할일 타이틀
     ///   - isDone: 할일 완료여부
     ///   - completion: 응답 결과
-    static func addATodoWithObservable(title: String,
+    static func addATodoWithPublisher(title: String,
                                        isDone: Bool = false) -> Observable<BaseResponse<Todo>>{
         
         // 1. urlRequest 를 만든다
@@ -315,7 +323,7 @@ extension TodosAPI {
     ///   - title: 할일 타이틀
     ///   - isDone: 할일 완료여부
     ///   - completion: 응답 결과
-    static func addATodoJsonWithObservable(title: String,
+    static func addATodoJsonWithPublisher(title: String,
                                            isDone: Bool = false) -> Observable<BaseResponse<Todo>>{
         
         // 1. urlRequest 를 만든다
@@ -386,7 +394,7 @@ extension TodosAPI {
     ///   - title: 타이틀
     ///   - isDone: 완료여부
     ///   - completion: 응답결과
-    static func editTodoJsonWithObservable(id: Int,
+    static func editTodoJsonWithPublisher(id: Int,
                                            title: String,
                                            isDone: Bool = false) -> Observable<BaseResponse<Todo>>{
         
@@ -458,7 +466,7 @@ extension TodosAPI {
     ///   - title: 타이틀
     ///   - isDone: 완료여부
     ///   - completion: 응답결과
-    static func editTodoWithObservable(id: Int,
+    static func editTodoWithPublisher(id: Int,
                                        title: String,
                                        isDone: Bool = false) -> Observable<BaseResponse<Todo>>{
         
@@ -521,7 +529,7 @@ extension TodosAPI {
     /// - Parameters:
     ///   - id: 삭제할 아이템 아이디
     ///   - completion: 응답결과
-    static func deleteATodoWithObservable(id: Int) -> Observable<BaseResponse<Todo>>{
+    static func deleteATodoWithPublisher(id: Int) -> Observable<BaseResponse<Todo>>{
         
         print(#fileID, #function, #line, "- deleteATodo 호출됨 / id: \(id)")
         
@@ -581,7 +589,7 @@ extension TodosAPI {
     ///   - title:
     ///   - isDone:
     ///   - completion:
-    static func addATodoAndFetchTodosWithObservable(title: String,
+    static func addATodoAndFetchTodosWithPublisher(title: String,
                                                     isDone: Bool = false) -> Observable<[Todo]>{
         
         // 1
@@ -603,7 +611,7 @@ extension TodosAPI {
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 실제 삭제가 완료된 아이디들
-    static func deleteSelectedTodosWithObservable(selectedTodoIds: [Int]) -> Observable<[Int]> {
+    static func deleteSelectedTodosWithPublisher(selectedTodoIds: [Int]) -> Observable<[Int]> {
         
         // 1. 매개변수 배열 -> Observable 스트림 배열
         
@@ -627,7 +635,7 @@ extension TodosAPI {
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 실제 삭제가 완료된 아이디들
     ///   Merge는 배열이 아닌 단일 아이템으로 들어온다
-    static func deleteSelectedTodosWithObservableMerge(selectedTodoIds: [Int]) -> Observable<Int>{
+    static func deleteSelectedTodosWithPublisherMerge(selectedTodoIds: [Int]) -> Observable<Int>{
         
         //1. 매개변수 배열 -> Observable 스트림 배열
         
@@ -646,7 +654,7 @@ extension TodosAPI {
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosWithObservable(selectedTodoIds: [Int]) -> Observable<[Todo]> {
+    static func fetchSelectedTodosWithPublisher(selectedTodoIds: [Int]) -> Observable<[Todo]> {
         
         // 1. 매개변수 배열 -> Observable 스트림 배열
         
@@ -666,7 +674,7 @@ extension TodosAPI {
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosWithObservableMerge(selectedTodoIds: [Int]) -> Observable<Todo> {
+    static func fetchSelectedTodosWithPublisherMerge(selectedTodoIds: [Int]) -> Observable<Todo> {
         
         // 1. 매개변수 배열 -> Observable 스트림 배열
         
