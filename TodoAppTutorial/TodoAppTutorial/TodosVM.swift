@@ -11,74 +11,52 @@ import Combine
 // ObserverbaleObject를 선언 하면 변경에 대한 감지가 가능
 class TodosVM: ObservableObject {
     
+    /// <#Description#>
     init() {
         print(#fileID, #function, #line, "- "    )
         
-        
-        
-        TodosAPI.addTodoAndFetchTodos(
-                                    title: "할일추가하고전체보기 123",
-                                    completion: { [weak self] result in
-            guard let self = self else { return }
+        TodosAPI.fetchSelectedTodos(selectedTodoIds: [2250, 2251, 2245], completion: { result in
             switch result {
-            case .success(let todolistResponse):
-                print("TodosVM todolistResponse - aTodoResponse: \(todolistResponse.data?.count)")
+            case .success(let data):
+                print("TodosVM - fetchSelectedTodos: data: \(data)")
             case .failure(let failure):
-                print("TodosVM todolistResponse - failure: \(failure)")
-                self.handleError(error: failure)
+                print("TodosVM - fetchSelectedTodos: failure: \(failure)")
             }
         })
         
+//        TodosAPI.deleteSelectedTodos(selectedTodoIds: [2251, 2249, 2247, 2246],
+//                                     completion: { [weak self] deletedTodos in
+//            print("TodosVM deletedTodos - deletedTodos: \(deletedTodos)")
+//        })
         
-        //        TodosAPI.editTodo(id: 2250, title: "오늘도 빡코딩?- 0423", isDone: true, completion: { [weak self] result in
+//        TodosAPI.deleteATodo(id: 2252,
+//                             completion: { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case .success(let aTodoResponse):
+//                print("TodosVM deleteATodo - deleteATodo: \(aTodoResponse)")
+//            case .failure(let failure):
+//                print("TodosVM todolistResponse - failure: \(failure)")
+//                self.handleError(error: failure)
+//            }
+//        })
+        
+        //        TodosAPI.addTodoAndFetchTodos(
+        //                                    title: "할일추가하고전체보기 123",
+        //                                    completion: { [weak self] result in
         //            guard let self = self else { return }
         //            switch result {
-        //            case .success(let aTodoResponse):
-        //                print("TodosVM addATodo - aTodoResponse: \(aTodoResponse)")
+        //            case .success(let todolistResponse):
+        //                print("TodosVM todolistResponse - aTodoResponse: \(todolistResponse.data?.count)")
         //            case .failure(let failure):
-        //                print("TodosVM addATodo - failure: \(failure)")
+        //                print("TodosVM todolistResponse - failure: \(failure)")
         //                self.handleError(error: failure)
         //            }
         //        })
         
-        
-        //        TodosAPI.searchTodos(searchTerm: "빡코딩") { [weak self] result in
-        //            guard let self = self else { return }
-        //
-        //            switch result {
-        //            case .success(let todosResponse):
-        //                print("TodosVM - search todosResponse: \(todosResponse)")
-        //            case .failure(let failure):
-        //                print("TodosVM - failure: \(failure)")
-        //                self.handleError(error: failure)
-        //            }
-        //        }
-        
-        //        TodosAPI.fetchATodo(id: 1500, completion: { [weak self] result in
-        //            guard let self = self else { return }
-        //            switch result {
-        //            case .success(let aTodoResponse):
-        //                print("TodosVM - aTodoResponse: \(aTodoResponse)")
-        //            case .failure(let failure):
-        //                print("TodosVM - failure: \(failure)")
-        //                self.handleError(error: failure)
-        //            }
-        //        })
-        
-        //        TodosAPI.fetchTodos { [weak self] result in
-        //            guard let self = self else { return }
-        //
-        //            switch result {
-        //            case .success(let todosResponse):
-        //                print("TodosVM - todosResponse: \(todosResponse)")
-        //            case .failure(let failure):
-        //                print("TodosVM - failure: \(failure)")
-        //                self.handleError(error: failure)
-        //            }
-        //        }
     }// init
     
-    // - Parameter error: API에러
+    // - Parameter error: API에러처리
     fileprivate func handleError(error: Error) {
         if error is TodosAPI.ApiError {
             let apiError = error as! TodosAPI.ApiError

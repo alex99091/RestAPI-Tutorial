@@ -7,6 +7,7 @@
 
 import Foundation
 import MultipartForm
+import SwiftUI
 
 extension TodosAPI {
     
@@ -488,10 +489,13 @@ extension TodosAPI {
     
     // 할일 삭제하기 - Delete
     // - Parameters
-    // - id:  삭제하 아이템 아이디
+    // - id:  삭제할 아이템 아이디
     // - completion: 응답 결과
     static func deleteATodo(id: Int, completion: @escaping
                             (Result<BaseResponse<Todo>, ApiError>) -> Void) {
+        
+        print(#fileID, #function, #line, "- deletedATodo 호출됨 / id: \(id)")
+        
         // 1. urlRequest를 만든다
         let urlString = baseURL + "/todos/\(id)"
         guard let url = URL(string: urlString) else {
@@ -499,7 +503,7 @@ extension TodosAPI {
         }
         
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "DElETE"
+        urlRequest.httpMethod = "DELETE"
         urlRequest.addValue("application/json", forHTTPHeaderField: "accept")
         
         // 2. urlSession으로 API를 호출한다
@@ -544,7 +548,7 @@ extension TodosAPI {
     }
     
     
-    /// 할일 추가 후, 모든 할일 가져오ㄱ
+    /// 할일 추가 후, 모든 할일 가져오기
     /// - Parameters:
     ///   - title:
     ///   - isDone:
@@ -574,6 +578,104 @@ extension TodosAPI {
                 completion(.failure(failure))
             }
         })
+    }
+    
+    /// 클로져 기반 모두삭제 api 동시처리
+    /// 선택된 할일들 삭제하기
+    /// - Parameters:
+    ///   - selectedTodoIds: 선택된 할일 ID
+    ///   - completion: 실제 삭제가 완료된 아이디들
+    static func deleteSelectedTodos(selectedTodoIds: [Int],
+                                    completion: @escaping ([Int]) -> Void) {
+        
+        let group = DispatchGroup()
+        
+        // 성공적으로 삭제가 된 id들
+        var deletedTodoIds: [Int] = [Int]()
+        
+        selectedTodoIds.forEach { aTodoId in
+            
+            // 디스패치 그룹에 넣기
+            group.enter()
+            self.deleteATodo(id: aTodoId, completion: { result  in
+                switch result {
+                case .success(let response):
+                    
+                    // 삭제된 아이디를 배열에 넣기
+                    if let todoId = response.data?.id {
+                        deletedTodoIds.append(todoId)
+                        print("inner deleteATodo - success: \(todoId)")
+                    }
+                case .failure(let failure):
+                    print("inner deleteATodo - failure")
+                }
+                group.leave()
+            })// 단일 삭제 API 호출
+        }
+        // Configure a completion callback
+        group.notify(queue: .main) {
+            // All requests completed
+            print("모든 API 완료 됨")
+            completion(deletedTodoIds)
+        }
+    }
+    
+    /// 클로져 기반 api 동시처리
+    /// 선택된 할일들 가져오기 + 에러캐치
+    /// - Parameters:
+    ///   - selectedTodoIds: 선택된 할일 ID
+    ///   - completion: 응답결과
+    static func fetchSelectedTodos(selectedTodoIds: [Int],
+                                    completion: @escaping (Result<[Todo], ApiError>) -> Void) {
+        
+        let group = DispatchGroup()
+        
+        // 가지고온 할일들
+        var fetchedTodos: [Todo] = [Todo]()
+        
+        // 에러들
+        var apiErrors: [ApiError] = [ApiError]()
+        
+        // 응답결과들
+        var apiResults = [Int: Result<BaseResponse<Todo>, ApiError>]()
+        
+        selectedTodoIds.forEach { aTodoId in
+            
+            // 디스패치 그룹에 넣기
+            group.enter()
+            
+            self.fetchATodo(id: aTodoId,
+                            completion: { result  in
+                switch result {
+                case .success(let response):
+                    // 가져온 할일을 가져온 할일배열에 넣기
+                    if let todo = response.data {
+                        fetchedTodos.append(todo)
+                        print("inner fetchATodo - success: \(todo)")
+                    }
+                case .failure(let failure):
+                    apiErrors.append(failure)
+                    print("inner fetchATodo - failure")
+                }
+                group.leave()
+            })// 단일 할일 조회 API 호출
+        }
+        
+        // Configure a completion callback
+        group.notify(queue: .main) {
+            // All requests completed
+            print("모든 API 완료 됨")
+            
+            // 에러처리
+            if !apiErrors.isEmpty {
+                if let apiError = apiErrors.first {
+                    completion(.failure(apiError))
+                    return
+                }
+            }
+            
+            completion(.success(fetchedTodos))
+        }
     }
     
 }
