@@ -11,6 +11,9 @@
 		260EAE262988826300610EA1 /* Button+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260EAE252988826300610EA1 /* Button+Style.swift */; };
 		260EAE292988871000610EA1 /* UISearchBarwrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260EAE282988871000610EA1 /* UISearchBarwrapper.swift */; };
 		260EAE2B298888AC00610EA1 /* TodoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260EAE2A298888AC00610EA1 /* TodoRow.swift */; };
+		261B15F4298AB28D00623CD7 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 261B15F3298AB28D00623CD7 /* CombineExt */; };
+		261B15F6298AB2CC00623CD7 /* TodosAPI+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */; };
+		261B15F8298AB2DE00623CD7 /* TodosAPI+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */; };
 		26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */; };
 		26ADCC4D2987D8940063757C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4C2987D8940063757C /* ContentView.swift */; };
 		26ADCC4F2987D8990063757C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC4E2987D8990063757C /* Assets.xcassets */; };
@@ -29,7 +32,6 @@
 		26EA1242298A542B00916058 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 26EA1241298A542B00916058 /* RxCocoa */; };
 		26EA1244298A542B00916058 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 26EA1243298A542B00916058 /* RxRelay */; };
 		26EA1246298A542B00916058 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 26EA1245298A542B00916058 /* RxSwift */; };
-		26EA1248298A547700916058 /* TodsAPI+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EA1247298A547700916058 /* TodsAPI+Rx.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,8 @@
 		260EAE252988826300610EA1 /* Button+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button+Style.swift"; sourceTree = "<group>"; };
 		260EAE282988871000610EA1 /* UISearchBarwrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISearchBarwrapper.swift; sourceTree = "<group>"; };
 		260EAE2A298888AC00610EA1 /* TodoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRow.swift; sourceTree = "<group>"; };
+		261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Rx.swift"; sourceTree = "<group>"; };
+		261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Combine.swift"; sourceTree = "<group>"; };
 		26ADCC472987D8930063757C /* TodoAppTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoAppTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAppTutorialApp.swift; sourceTree = "<group>"; };
 		26ADCC4C2987D8940063757C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,7 +56,6 @@
 		26E13C9F298979CD0039112E /* URL+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Ext.swift"; sourceTree = "<group>"; };
 		26E13CA42989A1490039112E /* URLRequest+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Ext.swift"; sourceTree = "<group>"; };
 		26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Closure.swift"; sourceTree = "<group>"; };
-		26EA1247298A547700916058 /* TodsAPI+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodsAPI+Rx.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,7 @@
 				26EA1244298A542B00916058 /* RxRelay in Frameworks */,
 				26EA1242298A542B00916058 /* RxCocoa in Frameworks */,
 				26EA1246298A542B00916058 /* RxSwift in Frameworks */,
+				261B15F4298AB28D00623CD7 /* CombineExt in Frameworks */,
 				26E13CA329897D370039112E /* MultipartForm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,7 +150,8 @@
 			children = (
 				26E13C972988E0AF0039112E /* TodosAPI.swift */,
 				26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */,
-				26EA1247298A547700916058 /* TodsAPI+Rx.swift */,
+				261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */,
+				261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -189,6 +194,7 @@
 				26EA1241298A542B00916058 /* RxCocoa */,
 				26EA1243298A542B00916058 /* RxRelay */,
 				26EA1245298A542B00916058 /* RxSwift */,
+				261B15F3298AB28D00623CD7 /* CombineExt */,
 			);
 			productName = TodoAppTutorial;
 			productReference = 26ADCC472987D8930063757C /* TodoAppTutorial.app */;
@@ -221,6 +227,7 @@
 			packageReferences = (
 				26E13CA129897D370039112E /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				26EA1240298A542B00916058 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				261B15F2298AB28D00623CD7 /* XCRemoteSwiftPackageReference "CombineExt" */,
 			);
 			productRefGroup = 26ADCC482987D8930063757C /* Products */;
 			projectDirPath = "";
@@ -254,14 +261,15 @@
 				260EAE222988786300610EA1 /* TodosView.swift in Sources */,
 				260EAE292988871000610EA1 /* UISearchBarwrapper.swift in Sources */,
 				26E13C9D2989377C0039112E /* TodosResponse.swift in Sources */,
+				261B15F6298AB2CC00623CD7 /* TodosAPI+Rx.swift in Sources */,
 				26E13CA52989A1490039112E /* URLRequest+Ext.swift in Sources */,
 				26ADCC4D2987D8940063757C /* ContentView.swift in Sources */,
 				26E13CA72989A5E80039112E /* TodosAPI+Closure.swift in Sources */,
 				26E13C9A298934200039112E /* TodosVM.swift in Sources */,
 				26ADCC5C2987DA4C0063757C /* MainVC.swift in Sources */,
 				26E13CA0298979CD0039112E /* URL+Ext.swift in Sources */,
-				26EA1248298A547700916058 /* TodsAPI+Rx.swift in Sources */,
 				260EAE262988826300610EA1 /* Button+Style.swift in Sources */,
+				261B15F8298AB2DE00623CD7 /* TodosAPI+Combine.swift in Sources */,
 				26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */,
 				260EAE2B298888AC00610EA1 /* TodoRow.swift in Sources */,
 				26ADCC6029886E8E0063757C /* TodoCell.swift in Sources */,
@@ -467,6 +475,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		261B15F2298AB28D00623CD7 /* XCRemoteSwiftPackageReference "CombineExt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/combineCommunity/CombineExt.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		26E13CA129897D370039112E /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davbeck/MultipartForm";
@@ -486,6 +502,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		261B15F3298AB28D00623CD7 /* CombineExt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 261B15F2298AB28D00623CD7 /* XCRemoteSwiftPackageReference "CombineExt" */;
+			productName = CombineExt;
+		};
 		26E13CA229897D370039112E /* MultipartForm */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 26E13CA129897D370039112E /* XCRemoteSwiftPackageReference "MultipartForm" */;
