@@ -7,22 +7,40 @@
 
 import Foundation
 import Combine
+import RxSwift
+import RxCocoa
+import RxRelay
+
 
 // ObserverbaleObject를 선언 하면 변경에 대한 감지가 가능
 class TodosVM: ObservableObject {
     
-    /// <#Description#>
+    var disposeBag = DisposeBag()
+    
     init() {
         print(#fileID, #function, #line, "- "    )
         
-        TodosAPI.fetchSelectedTodos(selectedTodoIds: [2250, 2251, 2245], completion: { result in
-            switch result {
-            case .success(let data):
-                print("TodosVM - fetchSelectedTodos: data: \(data)")
-            case .failure(let failure):
-                print("TodosVM - fetchSelectedTodos: failure: \(failure)")
-            }
-        })
+        TodosAPI.fetchTodosWithObservable()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .failure(let failure):
+                    self.handleError(error: failure)
+                case .success(let reponse):
+                    print("TodosVM - fetchTodosWithObservable: data: \(reponse)")
+                }
+            }).disposed(by: disposeBag)
+        
+        
+//        TodosAPI.fetchSelectedTodos(selectedTodoIds: [2250, 2251, 2245], completion: { result in
+//            switch result {
+//            case .success(let data):
+//                print("TodosVM - fetchSelectedTodos: data: \(data)")
+//            case .failure(let failure):
+//                print("TodosVM - fetchSelectedTodos: failure: \(failure)")
+//            }
+//        })
         
 //        TodosAPI.deleteSelectedTodos(selectedTodoIds: [2251, 2249, 2247, 2246],
 //                                     completion: { [weak self] deletedTodos in
