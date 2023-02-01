@@ -14,6 +14,7 @@
 		261B15F4298AB28D00623CD7 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 261B15F3298AB28D00623CD7 /* CombineExt */; };
 		261B15F6298AB2CC00623CD7 /* TodosAPI+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */; };
 		261B15F8298AB2DE00623CD7 /* TodosAPI+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */; };
+		261B15FA298ABB7100623CD7 /* TodosAPI+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F9298ABB7100623CD7 /* TodosAPI+Async.swift */; };
 		26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */; };
 		26ADCC4D2987D8940063757C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4C2987D8940063757C /* ContentView.swift */; };
 		26ADCC4F2987D8990063757C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC4E2987D8990063757C /* Assets.xcassets */; };
@@ -41,6 +42,7 @@
 		260EAE2A298888AC00610EA1 /* TodoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRow.swift; sourceTree = "<group>"; };
 		261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Rx.swift"; sourceTree = "<group>"; };
 		261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Combine.swift"; sourceTree = "<group>"; };
+		261B15F9298ABB7100623CD7 /* TodosAPI+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodosAPI+Async.swift"; sourceTree = "<group>"; };
 		26ADCC472987D8930063757C /* TodoAppTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoAppTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAppTutorialApp.swift; sourceTree = "<group>"; };
 		26ADCC4C2987D8940063757C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				26E13CA62989A5E80039112E /* TodosAPI+Closure.swift */,
 				261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */,
 				261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */,
+				261B15F9298ABB7100623CD7 /* TodosAPI+Async.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -270,6 +273,7 @@
 				26E13CA0298979CD0039112E /* URL+Ext.swift in Sources */,
 				260EAE262988826300610EA1 /* Button+Style.swift in Sources */,
 				261B15F8298AB2DE00623CD7 /* TodosAPI+Combine.swift in Sources */,
+				261B15FA298ABB7100623CD7 /* TodosAPI+Async.swift in Sources */,
 				26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */,
 				260EAE2B298888AC00610EA1 /* TodoRow.swift in Sources */,
 				26ADCC6029886E8E0063757C /* TodoCell.swift in Sources */,
@@ -329,7 +333,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -383,7 +387,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

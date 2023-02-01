@@ -22,20 +22,28 @@ class TodosVM: ObservableObject {
     init() {
         print(#fileID, #function, #line, "- ")
         
+        Task {
+            do {
+                let response = try await TodosAPI.fetchTodosWithAsync()
+                print("fetchTodosWithAsync response: \(response)")
+            } catch {
+                self.handleError(error: error)
+            }
+        }
         
-        TodosAPI.deleteSelectedTodosWithPublisherZip(selectedTodoIds: [1043, 1299, 9999, 8888])
-            .sink(receiveCompletion: { [weak self] completion in
-                guard let self = self else { return }
-                switch completion {
-                case .failure(let failure):
-                    self.handleError(error: failure)
-                case .finished:
-                    print("TodosVM - finished")
-                }
-            }, receiveValue: { response in
-                print("TodosVM - response: \(response)")
-            })
-            .store(in: &subscriptions)
+//        TodosAPI.deleteSelectedTodosWithPublisherZip(selectedTodoIds: [1043, 1299, 9999, 8888])
+//            .sink(receiveCompletion: { [weak self] completion in
+//                guard let self = self else { return }
+//                switch completion {
+//                case .failure(let failure):
+//                    self.handleError(error: failure)
+//                case .finished:
+//                    print("TodosVM - finished")
+//                }
+//            }, receiveValue: { response in
+//                print("TodosVM - response: \(response)")
+//            })
+//            .store(in: &subscriptions)
         
     }// init
     
