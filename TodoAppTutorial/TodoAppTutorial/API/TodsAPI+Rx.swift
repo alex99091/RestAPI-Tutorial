@@ -598,46 +598,47 @@ extension TodosAPI {
     }
     
     
-    /// 클로져 기반 api 동시 처리
+    /// Rx Observable 기반 api 동시 처리 (zip)
     /// 선택된 할일들 삭제하기
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 실제 삭제가 완료된 아이디들
-    static func deleteSelectedTodosWithObservable(selectedTodoIds: [Int],
-                                                  completion: @escaping ([Int]) -> Void){
+    static func deleteSelectedTodosWithObservable(selectedTodoIds: [Int]) -> Observable<[Int]> {
         
-        let group = DispatchGroup()
+        // 1. 매개변수 배열 -> Observable 스트림 배열
         
-        // 성공적으로 삭제가 이뤄진 녀석들
-        var deletedTodoIds : [Int] = [Int]()
-        
-        selectedTodoIds.forEach { aTodoId in
-            
-            // 디스패치 그룹에 넣음
-            group.enter()
-            
-            self.deleteATodo(id: aTodoId,
-                             completion: { result in
-                switch result {
-                case .success(let response):
-                    // 삭제된 아이디를 삭제된 아이디 배열에 넣는다
-                    if let todoId = response.data?.id {
-                        deletedTodoIds.append(todoId)
-                        print("inner deleteATodo - success: \(todoId)")
-                    }
-                case .failure(let failure):
-                    print("inner deleteATodo - failure: \(failure)")
+        // 2. 배열로 단일 api 호출
+        let apiCallObservables = selectedTodoIds.map { id -> Observable<Int?> in
+            return self.deleteATodoWithObservable(id: id)
+                .map{ $0.data?.id } // Int?
+                .catch { error in
+                    return Observable.just(nil)
                 }
-                group.leave()
-            })// 단일 삭제 API 호출
         }
         
-        // Configure a completion callback
-        group.notify(queue: .main) {
-            // All requests completed
-            print("모든 api 완료 됨")
-            completion(deletedTodoIds)
+        // Observable<[Int?]> -> 'compactmap 사용' Observable<[Int]>
+        return Observable.zip(apiCallObservables).map { $0.compactMap{ $0 }}
+        
+    }
+    
+    /// Rx Observable 기반 api 동시 처리 (merge)
+    /// 선택된 할일들 삭제하기
+    /// - Parameters:
+    ///   - selectedTodoIds: 선택된 할일 아이디들
+    ///   - completion: 실제 삭제가 완료된 아이디들
+    ///   Merge는 배열이 아닌 단일 아이템으로 들어온다
+    static func deleteSelectedTodosWithObservableMerge(selectedTodoIds: [Int]) -> Observable<Int>{
+        
+        //1. 매개변수 배열 -> Observable 스트림 배열
+        
+        //2. 배열로 단일 api들 호출
+        let apiCallObservables = selectedTodoIds.map { id -> Observable<Int?> in
+            return self.deleteATodoWithObservable(id: id)
+                .map{ $0.data?.id } // Int?
+                .catchAndReturn(nil)
         }
+        
+        return Observable.merge(apiCallObservables).compactMap{ $0 }
     }
     
     /// 클로져 기반 api 동시 처리

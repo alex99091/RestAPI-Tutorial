@@ -20,6 +20,21 @@ class TodosVM: ObservableObject {
     init() {
         print(#fileID, #function, #line, "- "    )
         
+        TodosAPI.deleteSelectedTodosWithObservableMerge(selectedTodoIds: [2267, 2266])
+            .subscribe(onNext: { deletedTodo in
+                print("TodoVM - deleteSelectedTodosWithObservable: deletedTodo: \(deletedTodo)")
+            }, onError: { err in
+                print("TodoVM - deleteSelectedTodosWithObservable: err: \(err)")
+            }).disposed(by: disposeBag)
+        
+        
+        //        TodosAPI.deleteSelectedTodosWithObservable(selectedTodoIds: [2265, 2264, 2263, 2262])
+        //            .subscribe(onNext: { deletedTodos in
+        //                print("TodoVM - deleteSelectedTodosWithObservable: deletedTodos: \(deletedTodos)")
+        //            }, onError: { err in
+        //                print("TodoVM - deleteSelectedTodosWithObservable: err: \(err)")
+        //            }).disposed(by: disposeBag)
+        
         TodosAPI.addATodoAndFetchTodosWithObservable(title: "오늘도 빡코딩 - 0201 ~~") // [Todo]
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] (response: [Todo]) in
