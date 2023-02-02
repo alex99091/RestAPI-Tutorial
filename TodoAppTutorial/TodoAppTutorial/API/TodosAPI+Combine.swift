@@ -77,6 +77,8 @@ extension TodosAPI {
             .eraseToAnyPublisher()
     }
     
+    // 구독 X
+    // 데이터 스트림 즉 물줄기만 변경
     /// 모든 할 일 목록 가져오기
     static func fetchTodosWithPublisher(page: Int = 1) -> AnyPublisher<BaseListResponse<Todo>, ApiError>{
         
@@ -323,8 +325,8 @@ extension TodosAPI {
                 }
                 
                 return data
-            })
-            .decode(type: BaseResponse<Todo>.self, decoder: JSONDecoder())
+            }) // Data
+            .decode(type: BaseResponse<Todo>.self, decoder: JSONDecoder()) // Decode
             .tryMap({ response in // 상태 코드는 200인데 파싱한 데이터에 따라서 에러처리
                 guard let _ = response.data else {
                     throw ApiError.noContent
@@ -827,4 +829,64 @@ extension TodosAPI {
         
         return Publishers.MergeMany(apiCallPublishers).compactMap{ $0 }.eraseToAnyPublisher()
     }
+}
+
+extension TodosAPI {
+    // 구독 O
+    // 받은 이벤트 기반으로 async 로 보냄
+    /// combine -> async
+    static func fetchTodosWithPublisherToAsync(page: Int = 1) async throws -> BaseListResponse<Todo> {
+        
+        return try await withCheckedThrowingContinuation({ (continuation : CheckedContinuation<BaseListResponse<Todo>, Error>) in
+            
+            var cancellable : AnyCancellable? = nil
+            
+            //1. 기존 publisher 이벤트를 구독
+            cancellable = fetchTodosWithPublisher(page: page)
+                // 2. 들어온 이벤트의 결과에 따라 async 이벤트 처리
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("finished")
+                    case .failure(let failure):
+                        print("failure : \(failure)")
+                        continuation.resume(throwing: failure)
+                    }
+                    cancellable?.cancel()
+                }, receiveValue: { response in
+                    print("receiveValue : \(response)")
+                    continuation.resume(returning: response)
+                })
+        })
+        
+    }
+}
+
+
+extension AnyPublisher {
+    
+    func toAsync() async throws -> Output {
+        
+        return try await withCheckedThrowingContinuation({ (continuation : CheckedContinuation<Output, Error>) in
+            
+            var cancellable : AnyCancellable? = nil
+            
+            //1. 기존 publisher 이벤트를 구독
+            cancellable = first()
+                // 2. 들어온 이벤트의 결과에 따라 async 이벤트 처리
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let failure):
+                        continuation.resume(throwing: failure)
+                    }
+                    cancellable?.cancel()
+                }, receiveValue: { response in
+                    continuation.resume(returning: response)
+                })
+        })
+        
+    }
+    
 }

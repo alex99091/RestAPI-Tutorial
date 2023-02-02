@@ -23,9 +23,12 @@ class TodosVM: ObservableObject {
         print(#fileID, #function, #line, "- ")
         
         Task {
-            
-            let result : [Todo] = await TodosAPI.fetchTodosClosureToAsyncReturnArray(page: 1)
-            print("result: \(result)")
+            do {
+                let result = try await TodosAPI.fetchTodosWithObservable(page: 1).toAsync()
+                print("result: \(result)")
+            } catch {
+                print("catch error: \(error)")
+            }
         }
         
     }// init
