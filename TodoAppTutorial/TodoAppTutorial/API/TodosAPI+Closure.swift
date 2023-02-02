@@ -7,6 +7,8 @@
 
 import Foundation
 import MultipartForm
+import RxSwift
+import Combine
 
 extension TodosAPI {
     
@@ -16,6 +18,8 @@ extension TodosAPI {
         // 1. urlRequest 를 만든다
         
         let urlString = baseURL + "/todos" + "?page=\(page)"
+        
+//        return completion(.failure(ApiError.notAllowedUrl))
         
         guard let url = URL(string: urlString) else {
             return completion(.failure(ApiError.notAllowedUrl))
@@ -77,75 +81,64 @@ extension TodosAPI {
         }.resume()
     }
     
-    /// 에러 처리 X - result
-    /// Closure -> Async
-    static func fetchTodosClosureToAsync(page: Int = 1) async -> Result<BaseListResponse<Todo>, ApiError> {
-        return await withCheckedContinuation { (continuation: CheckedContinuation<Result<BaseListResponse<Todo>, ApiError>, Never>) in
-            
-            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
-                continuation.resume(returning: result)
-            })
-        }
-    }
-    
-    /// 에러 처리 X - [Todo]
-    /// Closure -> Async
-    static func fetchTodosClosureToAsyncReturnArray(page: Int = 1) async -> [Todo] {
-        return await withCheckedContinuation { (continuation: CheckedContinuation<[Todo], Never>) in
-            
-            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
-                
-                switch result {
-                case .success(let success):
-                    continuation.resume(returning: success.data ?? [])
-                case .failure(let _):
-                    continuation.resume(returning: [])
-                }
-            })
-        }
-    }
-    
     
     /// 에러 처리 O
-    /// Closure -> Async
-    static func fetchTodosClosureToAsyncWithError(page: Int = 1) async throws -> BaseListResponse<Todo> {
-        
-        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BaseListResponse<Todo>, Error>) in
-            
-            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
-                switch result {
-                case .success(let success):
-                    continuation.resume(returning: success)
-                case .failure(let failure):
-                    continuation.resume(throwing: failure)
-                }
+    /// Closure -> Publisher
+    static func fetchTodosClosureToPublisher(page: Int = 1) -> AnyPublisher<BaseListResponse<Todo>, ApiError> {
+        return Future { (promise: @escaping (Result<BaseListResponse<Todo>, ApiError>) -> Void) in
+            fetchTodos(page: page, completion: { result in
+                promise(result)
             })
-        })
+        }.eraseToAnyPublisher()
     }
     
     /// 에러 처리 O - 에러 형태 변경
-    /// Closure -> Async
-    static func fetchTodosClosureToAsyncWithMapError(page: Int = 1) async throws -> BaseListResponse<Todo> {
-        
-        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BaseListResponse<Todo>, Error>) in
-            
-            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
-                switch result {
-                case .success(let success):
-                    continuation.resume(returning: success)
-                case .failure(let failure):
-                    
-                    if let decodingErr = failure as? DecodingError {
-                        continuation.resume(throwing: ApiError.decodingError)
-                        return
-                    }
-                    
-                    continuation.resume(throwing: ApiError.unknown(failure))
-                }
+    /// Closure -> Publisher
+    static func fetchTodosClosureToPublisherMapError(page: Int = 1) -> AnyPublisher<BaseListResponse<Todo>, ApiError> {
+        return Future { (promise: @escaping (Result<BaseListResponse<Todo>, ApiError>) -> Void) in
+            fetchTodos(page: page, completion: { result in
+                promise(result)
             })
+        }.mapError({ err in
+            if let urlErr = err as? ApiError {
+                return ApiError.unAuthorized
+            }
+            return err
         })
+        .eraseToAnyPublisher()
     }
     
+    /// 에러 처리 X - []
+    /// Closure -> Publisher
+    static func fetchTodosClosureToPublisherNoError(page: Int = 1) -> AnyPublisher<[Todo], Never> {
+        return Future { (promise: @escaping (Result<[Todo], Never>) -> Void) in
+            fetchTodos(page: page, completion: { result in
+                switch result {
+                case .success(let data):
+                    promise(.success(data.data ?? []))
+                case .failure(let failure):
+                    promise(.success([]))
+                }
+            })
+        }.eraseToAnyPublisher()
+    }
+    
+    
+    /// 에러 처리 X - []
+    /// Closure -> Publisher
+    static func fetchTodosClosureToPublisherReturnArray(page: Int = 1) -> AnyPublisher<[Todo], Never> {
+        return Future { (promise: @escaping (Result<BaseListResponse<Todo>, ApiError>) -> Void) in
+            fetchTodos(page: page, completion: { result in
+                promise(result)
+            })
+        }
+        .map{ $0.data ?? [] }
+        .catch({ err in
+            return Just([])
+        })
+//        .replaceError(with: [])
+        .eraseToAnyPublisher()
+    }
     
     
     /// 특정 할 일 가져오기
@@ -209,6 +202,7 @@ extension TodosAPI {
             
         }.resume()
     }
+    
     
     /// 할 일 검색하기
     static func searchTodos(searchTerm: String, page: Int = 1, completion: @escaping (Result<BaseListResponse<Todo>, ApiError>) -> Void){
@@ -813,4 +807,242 @@ extension TodosAPI {
             completion(.success(fetchedTodos))
         }
     }
+}
+
+
+//MARK: - Closure to Async
+extension TodosAPI {
+    
+    /// 에러 처리 X - result
+    /// Closure -> Async
+    static func fetchTodosClosureToAsync(page: Int = 1) async -> Result<BaseListResponse<Todo>, ApiError> {
+        return await withCheckedContinuation { (continuation: CheckedContinuation<Result<BaseListResponse<Todo>, ApiError>, Never>) in
+            
+            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
+                continuation.resume(returning: result)
+            })
+        }
+    }
+    
+    /// 에러 처리 X - [Todo]
+    /// Closure -> Async
+    static func fetchTodosClosureToAsyncReturnArray(page: Int = 1) async -> [Todo] {
+        return await withCheckedContinuation { (continuation: CheckedContinuation<[Todo], Never>) in
+            
+            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
+                
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success.data ?? [])
+                case .failure(let _):
+                    continuation.resume(returning: [])
+                }
+            })
+        }
+    }
+    
+    
+    /// 에러 처리 O
+    /// Closure -> Async
+    static func fetchTodosClosureToAsyncWithError(page: Int = 1) async throws -> BaseListResponse<Todo> {
+        
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BaseListResponse<Todo>, Error>) in
+            
+            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let failure):
+                    continuation.resume(throwing: failure)
+                }
+            })
+        })
+    }
+    
+    /// 에러 처리 O - 에러 형태 변경
+    /// Closure -> Async
+    static func fetchTodosClosureToAsyncWithMapError(page: Int = 1) async throws -> BaseListResponse<Todo> {
+        
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BaseListResponse<Todo>, Error>) in
+            
+            fetchTodos(page: page, completion: { (result : Result<BaseListResponse<Todo>, ApiError>) in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let failure):
+                    
+                    if let decodingErr = failure as? DecodingError {
+                        continuation.resume(throwing: ApiError.decodingError)
+                        return
+                    }
+                    
+                    continuation.resume(throwing: ApiError.unknown(failure))
+                }
+            })
+        })
+    }
+    
+    /// 에러 처리 O - 미션 풀이
+    /// Closure -> Async
+    static func fetchATodoClosureToAsync(id: Int) async throws -> BaseResponse<Todo> {
+        return try await withCheckedThrowingContinuation({ (continuation : CheckedContinuation<BaseResponse<Todo>, Error>) in
+            fetchATodo(id: id, completion: { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let failure):
+                    continuation.resume(throwing: failure)
+                }
+            })
+        })
+    }
+    
+    /// 에러 처리 X - 미션 풀이
+    /// Closure -> Async
+    static func fetchATodoClosureToAsyncNoError(id: Int) async -> BaseResponse<Todo>? {
+        return await withCheckedContinuation({ (continuation : CheckedContinuation<BaseResponse<Todo>?, Never>) in
+            fetchATodo(id: id, completion: { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let _):
+                    continuation.resume(returning: nil)
+                }
+            })
+        })
+    }
+    
+    /// 에러 처리 O - 미션 풀이 - 에러 형태 변경
+    /// Closure -> Async
+    static func fetchATodoClosureToAsyncMapError(id: Int) async throws -> BaseResponse<Todo> {
+        return try await withCheckedThrowingContinuation({ (continuation : CheckedContinuation<BaseResponse<Todo>, Error>) in
+            fetchATodo(id: id, completion: { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let failure):
+                    
+                    if let decodingErr = failure as? DecodingError {
+                        continuation.resume(throwing: ApiError.decodingError)
+                        return
+                    }
+                    
+                    continuation.resume(throwing: failure)
+                }
+            })
+        })
+    }
+    
+}
+
+//MARK: - Closure to Rx Observable
+extension TodosAPI {
+    
+    /// 에러 처리 X - result
+    /// Closure -> Rx Observable
+    static func fetchTodosClosureToObservable(page: Int = 1) -> Observable<Result<BaseListResponse<Todo>, ApiError>> {
+        return Observable.create { (observer : AnyObserver<Result<BaseListResponse<Todo>, ApiError>>) in
+            
+            fetchTodos(page: page, completion: { result in
+                observer.onNext(result)
+                observer.onCompleted()
+            })
+            
+            return Disposables.create()
+        }
+    }
+    
+    /// 에러 처리 X - 배열 [] - 에러시 빈배열
+    /// Closure -> Rx Observable
+    static func fetchTodosClosureToObservableDataArray(page: Int = 1) -> Observable<[Todo]> {
+        return Observable.create { (observer : AnyObserver<BaseListResponse<Todo>>) in
+            // 1
+            fetchTodos(page: page, completion: { result in
+                switch result {
+                case .success(let success): // 1-1
+                    observer.onNext(success)
+                    observer.onCompleted()
+                case .failure(let failure): // 1-2
+                    observer.onError(failure)
+                }
+            })
+            return Disposables.create()
+        }
+        .map{ $0.data ?? [] }
+//        .catch { err in
+//            return Observable.just([])
+//        }
+        .catchAndReturn([])
+        
+    }
+    
+    /// 에러 처리 O
+    /// Closure -> Rx Observable
+    static func fetchTodosClosureToObservableWithError(page: Int = 1) -> Observable<BaseListResponse<Todo>> {
+        return Observable.create { (observer : AnyObserver<BaseListResponse<Todo>>) in
+            
+            // 1
+            fetchTodos(page: page, completion: { result in
+                
+                switch result {
+                case .success(let success): // 1-1
+                    observer.onNext(success)
+                    observer.onCompleted()
+                case .failure(let failure): // 1-2
+                    observer.onError(failure)
+                }
+            })
+            
+            return Disposables.create()
+        }
+    }
+    
+    /// 에러 처리 O - 에러 형태 변경
+    /// Closure -> Rx Observable
+    static func fetchTodosClosureToObservableWithMapError(page: Int = 1) -> Observable<BaseListResponse<Todo>> {
+        return Observable.create { (observer : AnyObserver<BaseListResponse<Todo>>) in
+            // 1
+            fetchTodos(page: page, completion: { result in
+                switch result {
+                case .success(let success): // 1-1
+                    observer.onNext(success)
+                    observer.onCompleted()
+                case .failure(let failure): // 1-2
+                    observer.onError(failure)
+                }
+            })
+            return Disposables.create()
+        }.catch { failure in
+            
+            if let apiError = failure as? ApiError {
+                throw ApiError.unAuthorized
+            }
+            
+            throw failure
+        }
+    }
+    
+    /// 에러 처리 X  - 미션 풀이
+    /// Closure -> Rx Observable
+    static func fetchATodoClosureToObservableNoError(id: Int) -> Observable<Todo> {
+        return Observable.create { (observer: AnyObserver<BaseResponse<Todo>>) in
+            fetchATodo(id: id, completion: { result in
+                switch result {
+                case .success(let data):
+                    observer.onNext(data)
+                    observer.onCompleted()
+                case .failure(let failure):
+                    observer.onError(failure)
+                }
+            })
+            return Disposables.create()
+        }.compactMap{ response in
+            guard let todo = response.data else {
+                throw ApiError.noContent
+            }
+            return response.data
+        }
+    }
+    
+    
 }
