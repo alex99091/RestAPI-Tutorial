@@ -23,27 +23,9 @@ class TodosVM: ObservableObject {
         print(#fileID, #function, #line, "- ")
         
         Task {
-            do {
-                let response = try await TodosAPI.fetchTodosWithAsync()
-                print("fetchTodosWithAsync response: \(response)")
-            } catch {
-                self.handleError(error: error)
-            }
+            let response : [Int] = await TodosAPI.deleteSelectedTodosWithAsyncTaskGroupNoError(selectedTodoIds: [9999, 8888, 7777, 1646, 1615, 1612])
+                print("deleteSelectedTodosWithAsyncTaskGroupNoError response : \(response)")
         }
-        
-//        TodosAPI.deleteSelectedTodosWithPublisherZip(selectedTodoIds: [1043, 1299, 9999, 8888])
-//            .sink(receiveCompletion: { [weak self] completion in
-//                guard let self = self else { return }
-//                switch completion {
-//                case .failure(let failure):
-//                    self.handleError(error: failure)
-//                case .finished:
-//                    print("TodosVM - finished")
-//                }
-//            }, receiveValue: { response in
-//                print("TodosVM - response: \(response)")
-//            })
-//            .store(in: &subscriptions)
         
     }// init
     
