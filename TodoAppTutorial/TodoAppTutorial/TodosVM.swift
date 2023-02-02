@@ -23,14 +23,15 @@ class TodosVM: ObservableObject {
         print(#fileID, #function, #line, "- ")
         
         Task {
-            let response : [Int] = await TodosAPI.deleteSelectedTodosWithAsyncTaskGroupNoError(selectedTodoIds: [9999, 8888, 7777, 1646, 1615, 1612])
-                print("deleteSelectedTodosWithAsyncTaskGroupNoError response : \(response)")
+            
+            let result : [Todo] = await TodosAPI.fetchTodosClosureToAsyncReturnArray(page: 1)
+            print("result: \(result)")
         }
         
     }// init
     
     // - Parameter error: API에러처리
-    fileprivate func handleError(error: Error) {
+    fileprivate func handleError(_ error: Error) {
         if error is TodosAPI.ApiError {
             let apiError = error as! TodosAPI.ApiError
             print("handleError: error = \(apiError.info)")

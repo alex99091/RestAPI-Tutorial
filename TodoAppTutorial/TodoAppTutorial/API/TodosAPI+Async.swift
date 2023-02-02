@@ -859,7 +859,7 @@ extension TodosAPI {
     }
     
     
-    /// Asnyc 기반 api 동시 처리
+    /// Asnyc 기반 api 동시 처리 (에러처리 x)
     /// 선택된 할일들 가져오기
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
@@ -892,6 +892,11 @@ extension TodosAPI {
         }
     }
     
+    /// Asnyc 기반 api 동시 처리 (에러처리 O)
+    /// 선택된 할일들 가져오기
+    /// - Parameters:
+    ///   - selectedTodoIds: 선택된 할일 아이디들
+    ///   - completion: 응답 결과
     static func fetchSelectedTodosAsyncWithError(selectedTodoIds: [Int]) async throws -> [Todo] {
         
         try await withThrowingTaskGroup(of: Todo?.self, body: { (group: inout ThrowingTaskGroup<Todo?, Error>) in
