@@ -33,7 +33,15 @@ class TodosVM: ObservableObject {
             self.notifyCurrentPageChanged?(currentPage)
         }
     }
-    var isLoading: Bool = false
+    var isLoading: Bool = false {
+        didSet {
+            print(#fileID, #function, #line, "- ")
+            notifyLoadingStateChanged?(isLoading)
+        }
+    }
+    
+    // 데이터 로딩중 여부 변경 이벤트
+    var notifyLoadingStateChanged: ((_ isLoading: Bool) -> Void)? = nil
     
     // 데이터 변경 이벤트
     var notifyTodosChanged: (([Todo]) -> Void)? = nil

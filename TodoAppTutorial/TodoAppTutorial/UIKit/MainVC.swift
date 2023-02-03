@@ -15,8 +15,16 @@ class MainVC: UIViewController {
     @IBOutlet weak var pageInfoLabel: UILabel!
     
     var todos: [Todo] = []
-    
     var todosVM: TodosVM = TodosVM()
+    
+    // 바텀 인디케이터 뷰
+    lazy var bottomIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.color = UIColor.systemBlue
+        indicator.startAnimating()
+        indicator.frame = CGRect(x:0, y:0, width: myTableView.bounds.width, height: 44)
+        return indicator
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,11 +34,12 @@ class MainVC: UIViewController {
         // 테이블 뷰 설정
         self.myTableView.register(TodoCell.uinib, forCellReuseIdentifier: TodoCell.reuseIdentifier)
         self.myTableView.dataSource = self
-        
         self.myTableView.delegate = self
+        self.myTableView.tableFooterView = bottomIndicator
         
         // 뷰모델 이벤트 받기: 뷰와 뷰모델 바인딩
-        self.todosVM.notifyTodosChanged = { updatedTodos in
+        self.todosVM.notifyTodosChanged = { [weak self] updatedTodos in
+            guard let self = self else { return }
             self.todos = updatedTodos
             DispatchQueue.main.async {
                 self.myTableView.reloadData()
@@ -38,9 +47,17 @@ class MainVC: UIViewController {
         }
         
         // 페이지 변경 이벤트
-        self.todosVM.notifyCurrentPageChanged = { currentPage in
+        self.todosVM.notifyCurrentPageChanged = { [weak self] currentPage in
+            guard let self = self else { return }
             DispatchQueue.main.async {
                 self.pageInfoLabel.text = "페이지: \(currentPage)"
+            }
+        }
+        
+        self.todosVM.notifyLoadingStateChanged = { [weak self] isLoading in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.myTableView.tableFooterView = isLoading ? self.bottomIndicator : nil
             }
         }
         
