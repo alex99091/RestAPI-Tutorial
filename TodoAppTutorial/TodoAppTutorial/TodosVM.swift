@@ -39,6 +39,8 @@ class TodosVM: ObservableObject {
             notifyLoadingStateChanged?(isLoading)
         }
     }
+    // 리프레시 완료 이벤트
+    var notifyRefreshEnded: (() -> Void)? = nil
     
     // 데이터 로딩중 여부 변경 이벤트
     var notifyLoadingStateChanged: ((_ isLoading: Bool) -> Void)? = nil
@@ -54,6 +56,12 @@ class TodosVM: ObservableObject {
         
         fetchTodos()
     }// init
+    
+    // 데이터 리프레시
+    func fetchRefresh(){
+        print(#fileID, #function, #line, "- ")
+        self.fetchTodos(page: 1)
+    }
     
     // 더 가져오기 (페이징 처리)
     func fetchMore(){
@@ -91,6 +99,7 @@ class TodosVM: ObservableObject {
                 case .failure(let failure):
                     print("failure: \(failure)")
                 }
+                self.notifyRefreshEnded?()
                 self.isLoading = false
             })
         })

@@ -26,6 +26,16 @@ class MainVC: UIViewController {
         return indicator
     }()
     
+    // 당겨서 새로고침
+    lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+//        refreshControl.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+        refreshControl.tintColor = .systemBlue.withAlphaComponent(0.5)
+//       refreshControl.attributedTitle = NSAttributedString(string: "당겨서 새로고침")
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: .valueChanged)
+        return refreshControl
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print(#fileID, #function, #line, "- ")
@@ -35,7 +45,9 @@ class MainVC: UIViewController {
         self.myTableView.register(TodoCell.uinib, forCellReuseIdentifier: TodoCell.reuseIdentifier)
         self.myTableView.dataSource = self
         self.myTableView.delegate = self
+        
         self.myTableView.tableFooterView = bottomIndicator
+        self.myTableView.refreshControl = refreshControl
         
         // 뷰모델 이벤트 받기: 뷰와 뷰모델 바인딩
         self.todosVM.notifyTodosChanged = { [weak self] updatedTodos in
@@ -46,7 +58,7 @@ class MainVC: UIViewController {
             }
         }
         
-        // 페이지 변경 이벤트
+        // 페이지 변경 이벤트 - 로딩중 여부
         self.todosVM.notifyCurrentPageChanged = { [weak self] currentPage in
             guard let self = self else { return }
             DispatchQueue.main.async {
@@ -54,28 +66,29 @@ class MainVC: UIViewController {
             }
         }
         
-        self.todosVM.notifyLoadingStateChanged = { [weak self] isLoading in
+        // 당겨서 데이터 리프레시 완료
+        self.todosVM.notifyRefreshEnded = { [weak self] in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                self.myTableView.tableFooterView = isLoading ? self.bottomIndicator : nil
+                self.refreshControl.endRefreshing()
             }
         }
         
-//        MVC business 로직: 메인뷰와 데이터 연결
-//        TodosAPI.fetchTodos(page: 1, completion: { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//            case .success(let response):
-//                if let fetchedTodos: [Todo] = response.data {
-//                    self.todos = fetchedTodos
-//                    DispatchQueue.main.async {
-//                        self.myTableView.reloadData()
-//                    }
-//                }
-//            case .failure(let failure):
-//                print("failure: \(failure)")
-//            }
-//        })
+        //        MVC business 로직: 메인뷰와 데이터 연결
+        //        TodosAPI.fetchTodos(page: 1, completion: { [weak self] result in
+        //            guard let self = self else { return }
+        //            switch result {
+        //            case .success(let response):
+        //                if let fetchedTodos: [Todo] = response.data {
+        //                    self.todos = fetchedTodos
+        //                    DispatchQueue.main.async {
+        //                        self.myTableView.reloadData()
+        //                    }
+        //                }
+        //            case .failure(let failure):
+        //                print("failure: \(failure)")
+        //            }
+        //        })
         
         
     }// viewDidLoad
@@ -105,6 +118,19 @@ extension MainVC : UITableViewDataSource {
     }
 }
 
+//Mark: - refresh 처리
+extension MainVC {
+    
+    /// - Parameter sender:
+    @objc fileprivate func handleRefresh(_ sender: UIRefreshControl) {
+        print(#fileID, #function, #line, "- ")
+    
+    // 뷰모델에 시키기
+        self.todosVM.fetchRefresh()
+        
+    }
+}
+
 extension MainVC: UITableViewDelegate {
     
     /// - Parameter scrollView
@@ -113,7 +139,7 @@ extension MainVC: UITableViewDelegate {
         let height = scrollView.frame.size.height
         let contentYOffset = scrollView.contentOffset.y
         let distanceFromBottom = scrollView.contentSize.height - contentYOffset
-
+        
         if distanceFromBottom - 150 < height {
             print("바닥이다")
             self.todosVM.fetchMore()
