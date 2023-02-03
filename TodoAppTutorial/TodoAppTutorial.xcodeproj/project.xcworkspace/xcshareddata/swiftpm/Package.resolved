@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davbeck/MultipartForm",
       "state" : {
-        "revision" : "c91979ea956a360bf84f0cc480afbcc7c946c753",
-        "version" : "0.1.0"
+        "branch" : "master",
+        "revision" : "c91979ea956a360bf84f0cc480afbcc7c946c753"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/CombineCommunity/RxCombine.git",
       "state" : {
-        "revision" : "19474c2ac9fde613bba8513bf98990e1aa9831cd",
-        "version" : "2.0.1"
+        "branch" : "main",
+        "revision" : "010ef6fcca69cbbabe8ed7f52b31485b70c3a22d"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ReactiveX/RxSwift.git",
       "state" : {
-        "revision" : "b4307ba0b6425c0ba4178e138799946c3da594f8",
-        "version" : "6.5.0"
+        "branch" : "main",
+        "revision" : "91a36920b1ec069004fef9dc41b7c5dbcaa5fffe"
       }
     }
   ],

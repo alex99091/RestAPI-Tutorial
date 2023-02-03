@@ -23,20 +23,6 @@ class TodosVM: ObservableObject {
     init() {
         print(#fileID, #function, #line, "- ")
         
-        let fetchTodosTask = Task.retry(retryCount: 3, delay: 2, asyncWork: {
-                                try await TodosAPI.fetchTodosWithAsync(page: 999)
-                            })
-        
-        Task {
-            do {
-                let result = try await fetchTodosTask.value
-                print("retry - :: result call : \(result)")
-            } catch {
-                print("retry - :: error call : \(error)")
-            }
-        }
-
-        
     }// init
     
     // - Parameter error: API에러처리
