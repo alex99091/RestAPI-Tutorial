@@ -43,7 +43,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    return .failure(ApiError.unAuthorized)
+                    return .failure(ApiError.unauthorized)
                 default: print("default")
                 }
                 
@@ -108,7 +108,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 default: print("default")
                 }
                 
@@ -138,6 +138,7 @@ extension TodosAPI {
                 
                 return ApiError.unknown(nil)
             })
+            .print("Combine fetchTodos")
             .eraseToAnyPublisher()
     }
     
@@ -171,7 +172,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -234,7 +235,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 default: print("default")
                 }
                 
@@ -313,7 +314,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -394,7 +395,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -477,7 +478,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -553,7 +554,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -622,7 +623,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -886,7 +887,32 @@ extension AnyPublisher {
                     continuation.resume(returning: response)
                 })
         })
-        
+    }
+}
+
+//MARK: - Combine Retry
+extension Publisher {
+    
+    
+    func retryWithDelayAndCondition<T, E>(retryCount: Int = 1,
+                                    delay: Int = 1,
+                                    when: ((Error) -> Bool)? = nil
+    ) -> Publishers.TryCatch<Self, AnyPublisher<T, E>> where T == Self.Output, E == Self.Failure {
+        return self.tryCatch({ err -> AnyPublisher<T, E> in
+                
+            // 조건
+            guard (when?(err) ?? true) else {
+                throw err
+            }
+                
+            return Just(Void())
+                .delay(for: .seconds(delay), scheduler: DispatchQueue.main) // 딜레이
+                .flatMap { _ in
+                    return self
+                }
+                .retry(retryCount - 1)
+                .eraseToAnyPublisher()
+            })
     }
     
 }

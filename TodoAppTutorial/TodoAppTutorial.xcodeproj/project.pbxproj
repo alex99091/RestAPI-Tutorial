@@ -15,6 +15,7 @@
 		261B15F6298AB2CC00623CD7 /* TodosAPI+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F5298AB2CC00623CD7 /* TodosAPI+Rx.swift */; };
 		261B15F8298AB2DE00623CD7 /* TodosAPI+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F7298AB2DE00623CD7 /* TodosAPI+Combine.swift */; };
 		261B15FA298ABB7100623CD7 /* TodosAPI+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261B15F9298ABB7100623CD7 /* TodosAPI+Async.swift */; };
+		261E5D07298BB4AE00DC204F /* RxCombine in Frameworks */ = {isa = PBXBuildFile; productRef = 261E5D06298BB4AE00DC204F /* RxCombine */; };
 		26ADCC4B2987D8930063757C /* TodoAppTutorialApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4A2987D8930063757C /* TodoAppTutorialApp.swift */; };
 		26ADCC4D2987D8940063757C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADCC4C2987D8940063757C /* ContentView.swift */; };
 		26ADCC4F2987D8990063757C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26ADCC4E2987D8990063757C /* Assets.xcassets */; };
@@ -69,6 +70,7 @@
 				26EA1242298A542B00916058 /* RxCocoa in Frameworks */,
 				26EA1246298A542B00916058 /* RxSwift in Frameworks */,
 				261B15F4298AB28D00623CD7 /* CombineExt in Frameworks */,
+				261E5D07298BB4AE00DC204F /* RxCombine in Frameworks */,
 				26E13CA329897D370039112E /* MultipartForm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -198,6 +200,7 @@
 				26EA1243298A542B00916058 /* RxRelay */,
 				26EA1245298A542B00916058 /* RxSwift */,
 				261B15F3298AB28D00623CD7 /* CombineExt */,
+				261E5D06298BB4AE00DC204F /* RxCombine */,
 			);
 			productName = TodoAppTutorial;
 			productReference = 26ADCC472987D8930063757C /* TodoAppTutorial.app */;
@@ -231,6 +234,7 @@
 				26E13CA129897D370039112E /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				26EA1240298A542B00916058 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				261B15F2298AB28D00623CD7 /* XCRemoteSwiftPackageReference "CombineExt" */,
+				261E5D05298BB4AE00DC204F /* XCRemoteSwiftPackageReference "RxCombine" */,
 			);
 			productRefGroup = 26ADCC482987D8930063757C /* Products */;
 			projectDirPath = "";
@@ -487,6 +491,14 @@
 				kind = branch;
 			};
 		};
+		261E5D05298BB4AE00DC204F /* XCRemoteSwiftPackageReference "RxCombine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CombineCommunity/RxCombine.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		26E13CA129897D370039112E /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davbeck/MultipartForm";
@@ -510,6 +522,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 261B15F2298AB28D00623CD7 /* XCRemoteSwiftPackageReference "CombineExt" */;
 			productName = CombineExt;
+		};
+		261E5D06298BB4AE00DC204F /* RxCombine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 261E5D05298BB4AE00DC204F /* XCRemoteSwiftPackageReference "RxCombine" */;
+			productName = RxCombine;
 		};
 		26E13CA229897D370039112E /* MultipartForm */ = {
 			isa = XCSwiftPackageProductDependency;

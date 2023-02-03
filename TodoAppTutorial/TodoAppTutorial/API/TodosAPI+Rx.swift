@@ -32,7 +32,6 @@ extension TodosAPI {
         return URLSession.shared.rx
             .response(request: urlRequest)
             .map({ (urlResponse: HTTPURLResponse, data: Data) -> Result<BaseListResponse<Todo>, ApiError> in
-                
                 print("data: \(data)")
                 print("urlResponse: \(urlResponse)")
                      
@@ -43,7 +42,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    return .failure(ApiError.unAuthorized)
+                    return .failure(ApiError.unauthorized)
                 default: print("default")
                 }
                 
@@ -90,7 +89,8 @@ extension TodosAPI {
         // 3. API 호출에 대한 응답을 받는다
         return URLSession.shared.rx
             .response(request: urlRequest)
-            .map({ (urlResponse: HTTPURLResponse, data: Data) -> BaseListResponse<Todo> in
+            .debug("Rx 리트라이 --")
+            .map({ (urlResponse: HTTPURLResponse, data: Data) -> Data in
                 
                 print("data: \(data)")
                 print("urlResponse: \(urlResponse)")
@@ -102,32 +102,32 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 default: print("default")
                 }
                 
                 if !(200...299).contains(httpResponse.statusCode){
                     throw ApiError.badStatus(code: httpResponse.statusCode)
                 }
-                
-                do {
-                    // JSON -> Struct 로 변경 즉 디코딩 즉 데이터 파싱
-                  let listResponse = try JSONDecoder().decode(BaseListResponse<Todo>.self, from: data)
-                  let todos = listResponse.data
-                    print("todosResponse: \(listResponse)")
-                    
-                    // 상태 코드는 200인데 파싱한 데이터에 따라서 에러처리
-                    guard let todos = todos,
-                          !todos.isEmpty else {
-                        throw ApiError.noContent
-                    }
-                    
-                    return listResponse
-                } catch {
-                  // decoding error
+                return data
+            })
+            .decode(type: BaseListResponse<Todo>.self, decoder: JSONDecoder())
+            .map { response in
+                guard let todos = response.data,
+                        !todos.isEmpty else {
+                    throw ApiError.noContent
+                }
+                return response
+            }
+            .catch { err in
+                if let error = err as? ApiError {
+                    throw error
+                }
+                if let _ = err as? DecodingError {
                     throw ApiError.decodingError
                 }
-            })
+                throw ApiError.unknown(err)
+            }
     }
     
     /// 특정 할 일 가져오기
@@ -159,7 +159,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                     
@@ -211,7 +211,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -287,7 +287,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -357,7 +357,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -429,7 +429,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -494,7 +494,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -552,7 +552,7 @@ extension TodosAPI {
                 
                 switch httpResponse.statusCode {
                 case 401:
-                    throw ApiError.unAuthorized
+                    throw ApiError.unauthorized
                 case 204:
                     throw ApiError.noContent
                 default: print("default")
@@ -676,51 +676,111 @@ extension TodosAPI {
     }
 }
 
-
 extension TodosAPI {
     
     static func fetchTodosWithObservableToAsync(page: Int = 1) async throws -> BaseListResponse<Todo> {
         
         return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BaseListResponse<Todo>, Error>) in
             
-            var disposable: Disposable? = nil
+            var disposable : Disposable? = nil
             
             disposable = fetchTodosWithObservable(page: page)
                 .subscribe(onNext: { response in
-                    print("onNext!")
+                    print("onNext :\(response)")
                     continuation.resume(returning: response)
-                }, onError: { error in
-                    print("onError!")
-                    continuation.resume(throwing: error)
+                }, onError: { err in
+                    print("onError :\(err)")
+                    continuation.resume(throwing: err)
                 }, onCompleted: {
-                    print("onCompleted!")
+                    print("onCompleted")
                     disposable?.dispose()
                 }, onDisposed: {
-                    print("onDisposed!")
+                    print("onDisposed")
                 })
+            
         })
+        
     }
     
 }
 
-extension ObservableType {
-    
-    func toAsync() async throws -> Element {
-        
-        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Element, Error>) in
-            
-            var disposable: Disposable? = nil
-            
-            disposable = single()
-                .subscribe(onNext: { response in
-                    continuation.resume(returning: response)
-                }, onError: { error in
-                    continuation.resume(throwing: error)
-                }, onCompleted: {
-                    disposable?.dispose()
-                }, onDisposed: {
-                })
-        })
-    }
-    
-}
+//extension ObservableType {
+//    
+//    // 횟수, 딜레이
+//    func retryWithDelayAndCondition(retryCount: Int = 1,
+//                                    delay : Int = 1,
+//                                    when : ((Error) -> Bool)? = nil
+//    ) -> Observable<Element> {
+//
+//        var requestCount : Int = 0
+//
+//        return self.retry(when: { (observableErr : Observable<TodosAPI.ApiError>) in
+//
+//                observableErr
+//                    .do(onNext: { err in
+//                        print("observableErr - err : \(err) requestCount : \(requestCount)")
+//                    })
+//                    .flatMap { err in
+//
+//                        // 에러 -> boolean
+//                        if !(when?(err) ?? true) {
+//                            throw err
+//                        }
+//
+//                        requestCount += 1
+//
+//                        return Observable<Void>.just(()).delay(.seconds(delay),
+//                                                               scheduler: MainScheduler.instance)
+//                    }
+//                    .take(retryCount)
+//            })
+//
+//    }
+//
+//    // 횟수, 딜레이
+//    func retryWithDelayAndConditionCatch(retryCount: Int = 1,
+//                                    delay : Int = 1,
+//                                    when : ((Error) -> Bool)? = nil
+//    ) -> Observable<Element> {
+//
+//        var requestCount : Int = 0
+//
+//        return self.catch { err -> Observable<Element> in
+//
+//            // 에러 -> boolean
+//            if !(when?(err) ?? true) {
+//                throw err
+//            }
+//
+//            return Observable<Void>
+//                    .just(())
+//                    .delay(.seconds(delay),scheduler: MainScheduler.instance)
+//                    .flatMap { _  in
+//                        requestCount += 1
+//                        print("requestCount : \(requestCount)")
+//                        return self
+//                    }
+//                    .retry(retryCount)
+//        }
+//    }
+//
+//    func toAsync() async throws -> Element {
+//
+//
+//        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Element, Error>) in
+//
+//            var disposable : Disposable? = nil
+//
+//            disposable = single()
+//                .subscribe(onNext: { response in
+//                    continuation.resume(returning: response)
+//                }, onError: { err in
+//                    continuation.resume(throwing: err)
+//                }, onCompleted: {
+//                    disposable?.dispose()
+//                }, onDisposed: {
+//                })
+//        })
+//
+//    }
+//}

@@ -38,7 +38,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 return .failure(ApiError.unknown(nil))
@@ -46,7 +46,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                return .failure(ApiError.unAuthorized)
+                return .failure(ApiError.unauthorized)
             default: print("default")
             }
             
@@ -77,6 +77,8 @@ extension TodosAPI {
         }
     }
     
+    
+    
     /// 모든 할 일 목록 가져오기
     static func fetchTodosWithAsync(page: Int = 1) async throws -> BaseListResponse<Todo>{
         
@@ -101,7 +103,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -110,7 +112,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -135,6 +137,10 @@ extension TodosAPI {
             
         } catch {
             
+            if let myApiErr = error as? ApiError {
+                throw myApiErr
+            }
+            
             if let apiError = error as? URLError {
                 throw ApiError.badStatus(code: apiError.errorCode)
             }
@@ -145,7 +151,7 @@ extension TodosAPI {
             
             throw ApiError.unknown(error)
         }
-        
+            
     }
     
     /// 특정 할 일 가져오기
@@ -171,7 +177,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -180,7 +186,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -238,7 +244,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -247,7 +253,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -290,7 +296,7 @@ extension TodosAPI {
     ///   - isDone: 할일 완료여부
     ///   - completion: 응답 결과
     static func addATodoWithAsync(title: String,
-                                  isDone: Bool = false) async throws -> BaseResponse<Todo>{
+                         isDone: Bool = false) async throws -> BaseResponse<Todo>{
         
         // 1. urlRequest 를 만든다
         
@@ -322,7 +328,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -331,7 +337,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -372,7 +378,7 @@ extension TodosAPI {
     ///   - isDone: 할일 완료여부
     ///   - completion: 응답 결과
     static func addATodoJsonWithAsync(title: String,
-                                      isDone: Bool = false) async throws -> BaseResponse<Todo>{
+                         isDone: Bool = false) async throws -> BaseResponse<Todo>{
         
         // 1. urlRequest 를 만든다
         
@@ -406,7 +412,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -415,7 +421,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -457,8 +463,8 @@ extension TodosAPI {
     ///   - isDone: 완료여부
     ///   - completion: 응답결과
     static func editTodoJsonWithAsync(id: Int,
-                                      title: String,
-                                      isDone: Bool = false) async throws -> BaseResponse<Todo>{
+                             title: String,
+                             isDone: Bool = false) async throws -> BaseResponse<Todo>{
         
         // 1. urlRequest 를 만든다
         
@@ -492,7 +498,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -501,7 +507,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -543,8 +549,8 @@ extension TodosAPI {
     ///   - isDone: 완료여부
     ///   - completion: 응답결과
     static func editTodoWithAsync(id: Int,
-                                  title: String,
-                                  isDone: Bool = false) async throws -> BaseResponse<Todo>{
+                             title: String,
+                             isDone: Bool = false) async throws -> BaseResponse<Todo>{
         
         // 1. urlRequest 를 만든다
         
@@ -571,7 +577,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -580,7 +586,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
                 
             default: print("default")
             }
@@ -634,7 +640,7 @@ extension TodosAPI {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "DELETE"
         urlRequest.addValue("application/json", forHTTPHeaderField: "accept")
-        
+
         
         // 2. urlSession 으로 API를 호출한다
         // 3. API 호출에 대한 응답을 받는다
@@ -643,7 +649,7 @@ extension TodosAPI {
             
             print("data: \(data)")
             print("urlResponse: \(urlResponse)")
-            
+                 
             guard let httpResponse = urlResponse as? HTTPURLResponse else {
                 print("bad status code")
                 
@@ -652,7 +658,7 @@ extension TodosAPI {
             
             switch httpResponse.statusCode {
             case 401:
-                throw ApiError.unAuthorized
+                throw ApiError.unauthorized
             case 204:
                 throw ApiError.noContent
             default: print("default")
@@ -699,7 +705,7 @@ extension TodosAPI {
     ///   - isDone:
     ///   - completion:
     static func addATodoAndFetchTodosWithAsyncWithError(title: String,
-                                                        isDone: Bool = false) async throws -> [Todo]{
+                                      isDone: Bool = false) async throws -> [Todo]{
         
         // 1번 끝나고
         let firstResult = try await addATodoWithAsync(title: title)
@@ -720,7 +726,7 @@ extension TodosAPI {
     ///   - isDone:
     ///   - completion:
     static func addATodoAndFetchTodosWithAsyncNoError(title: String,
-                                                      isDone: Bool = false) async -> [Todo]{
+                                      isDone: Bool = false) async -> [Todo]{
         
         do {
             
@@ -832,6 +838,7 @@ extension TodosAPI {
     ///   - completion: 실제 삭제가 완료된 아이디들
     static func deleteSelectedTodosWithAsyncTaskGroupNoError(selectedTodoIds: [Int]) async -> [Int]{
         
+        
         await withTaskGroup(of: Int?.self) { (group : inout TaskGroup<Int?>) -> [Int] in
             
             // 각각 자식 async 태스크를 그룹에 넣기
@@ -859,12 +866,13 @@ extension TodosAPI {
     }
     
     
-    /// Asnyc 기반 api 동시 처리 (에러처리 x)
+    /// Async 기반 api 동시 처리
     /// 선택된 할일들 가져오기
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosAsyncNoError(selectedTodoIds: [Int]) async -> [Todo] {
+    static func fetchSelectedTodosAsyncNoError(selectedTodoIds: [Int]) async -> [Todo]{
+        
         
         await withTaskGroup(of: Todo?.self) { (group : inout TaskGroup<Todo?>) -> [Todo] in
             
@@ -892,12 +900,12 @@ extension TodosAPI {
         }
     }
     
-    /// Asnyc 기반 api 동시 처리 (에러처리 O)
+    /// Async 기반 api 동시 처리
     /// 선택된 할일들 가져오기
     /// - Parameters:
     ///   - selectedTodoIds: 선택된 할일 아이디들
     ///   - completion: 응답 결과
-    static func fetchSelectedTodosAsyncWithError(selectedTodoIds: [Int]) async throws -> [Todo] {
+    static func fetchSelectedTodosAsyncWithError(selectedTodoIds: [Int]) async throws -> [Todo]{
         
         try await withThrowingTaskGroup(of: Todo?.self, body: { (group: inout ThrowingTaskGroup<Todo?, Error>) in
             
@@ -919,6 +927,175 @@ extension TodosAPI {
         })
     }
     
+}
+
+//MARK: - Async to Combine
+extension TodosAPI {
+    
+    static func fetchTodosAsyncToPublisher(page: Int) -> AnyPublisher<BaseListResponse<Todo>, Error> {
+        
+        return Future { (promise: @escaping (Result<BaseListResponse<Todo>, Error>) -> Void) in
+            Task{
+                do {
+                    let asyncResult = try await fetchTodosWithAsync(page: page)
+                    
+                    promise(.success(asyncResult))
+                    
+                } catch {
+                    
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    static func genericAsyncToPublisher<T>(asyncWork: @escaping () async throws -> T) -> AnyPublisher<T, Error> {
+        
+        return Future { (promise: @escaping (Result<T, Error>) -> Void) in
+            Task{
+                do {
+                    let asyncResult = try await asyncWork()
+                    
+                    promise(.success(asyncResult))
+                    
+                } catch {
+                    
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
+
+extension Publisher {
+    
+    func mapAsync<T>(asyncWork: @escaping (Output) async throws -> T) -> Publishers.FlatMap<Future<T, Error>, Publishers.SetFailureType<Self, Error>> {
+        
+        return flatMap { output in
+            return Future { (promise: @escaping (Result<T, Error>) -> Void) in
+                Task{
+                    do {
+                        let asyncResult = try await asyncWork(output)
+                        
+                        promise(.success(asyncResult))
+                        
+                    } catch {
+                        
+                        promise(.failure(error))
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+
+//MARK: - Async to Rx Observable
+extension TodosAPI {
+    
+    static func fetchTodosAsyncToObservable(page: Int) -> Observable<BaseListResponse<Todo>> {
+        
+        return Observable.create {  (observer : AnyObserver<BaseListResponse<Todo>>) in
+            Task{
+                do {
+                    let asyncResult = try await fetchTodosWithAsync(page: page)
+                    observer.onNext(asyncResult)
+                    observer.onCompleted()
+                } catch {
+                    
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    static func genericAsyncToObservable<T>(asyncWork: @escaping () async throws -> T) -> Observable<T> {
+        
+        return Observable.create {  (observer : AnyObserver<T>) in
+            Task{
+                do {
+                    let asyncResult = try await asyncWork()
+                    observer.onNext(asyncResult)
+                    observer.onCompleted()
+                } catch {
+                    
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+}
+
+extension ObservableType {
+    
+    func mapAsync<T>(asyncWork: @escaping (Element) async throws -> T) -> Observable<T> {
+        
+        return flatMap { element in
+            return Observable.create {  (observer : AnyObserver<T>) in
+                Task{
+                    do {
+                        let asyncResult = try await asyncWork(element)
+                        observer.onNext(asyncResult)
+                        observer.onCompleted()
+                    } catch {
+                        
+                        observer.onError(error)
+                    }
+                }
+                return Disposables.create()
+            }
+        }
+    }
+}
+
+
+//MARK: - Acync Retry
+
+extension Task where Failure == Error {
+    
+    enum TaskRetryError : Error {
+        case maxRetryRequest
+    }
+    
+    static func retry(retryCount: Int = 1,
+                      delay: Int = 1,
+                      when: ((Error) -> Bool)? = nil,
+                      asyncWork: @Sendable @escaping () async throws -> Success
+    ) -> Task {
+        
+        // 횟수, 딜레이, 조건
+        return Task {
+            for _ in 0...retryCount {
+                do {
+                    
+                    // 성공시 리턴
+                    let result = try await asyncWork()
+                    print("retry - result: \(result)")
+                    return result
+                    
+                } catch {
+                    print("retry - error: \(error)")
+                    
+                    // 특정 조건일 때
+                    guard (when?(error) ?? true) else {
+                        throw error
+                    }
+                    
+                    // 딜레이
+                    try await Task<Never, Never>.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    // 위로
+                    continue
+                }
+            }
+            throw TaskRetryError.maxRetryRequest
+        }// Task
+    }
     
     
 }

@@ -10,6 +10,7 @@ import Combine
 import RxSwift
 import RxCocoa
 import RxRelay
+import RxCombine
 
 
 // ObserverbaleObject를 선언 하면 변경에 대한 감지가 가능
@@ -22,14 +23,19 @@ class TodosVM: ObservableObject {
     init() {
         print(#fileID, #function, #line, "- ")
         
+        let fetchTodosTask = Task.retry(retryCount: 3, delay: 2, asyncWork: {
+                                try await TodosAPI.fetchTodosWithAsync(page: 999)
+                            })
+        
         Task {
             do {
-                let result = try await TodosAPI.fetchTodosWithObservable(page: 1).toAsync()
-                print("result: \(result)")
+                let result = try await fetchTodosTask.value
+                print("retry - :: result call : \(result)")
             } catch {
-                print("catch error: \(error)")
+                print("retry - :: error call : \(error)")
             }
         }
+
         
     }// init
     
@@ -41,7 +47,7 @@ class TodosVM: ObservableObject {
             switch apiError {
             case .noContent:
                 print("컨텐츠가 없습니다.")
-            case .unAuthorized:
+            case .unauthorized:
                 print("인증되지 않았습니다.")
             default:
                 print("default")
