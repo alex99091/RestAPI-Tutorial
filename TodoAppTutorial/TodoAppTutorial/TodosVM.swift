@@ -17,13 +17,40 @@ import RxCombine
 class TodosVM: ObservableObject {
     
     var disposeBag = DisposeBag()
-    
     var subscriptions = Set<AnyCancellable>()
+    
+    // 가공된 최종 데이터
+    var todos: [Todo] = [] {
+        didSet {
+            print(#fileID, #function, #line, "- ")
+            self.notifyTodosChanged?(todos)
+        }
+    }
+    
+    // 데이터 변경 이벤트
+    var notifyTodosChanged: (([Todo]) -> Void)? = nil
     
     init() {
         print(#fileID, #function, #line, "- ")
         
+        fetchTodos()
     }// init
+    
+    func fetchTodos(page:Int = 1) {
+        
+        // 서비스 로직
+        TodosAPI.fetchTodos(page: 1, completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                if let fetchedTodos: [Todo] = response.data {
+                    self.todos = fetchedTodos
+                }
+            case .failure(let failure):
+                print("failure: \(failure)")
+            }
+        })
+    }
     
     // - Parameter error: API에러처리
     fileprivate func handleError(_ error: Error) {

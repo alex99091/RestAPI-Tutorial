@@ -60,6 +60,7 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="1Ij-Cn-ahm" firstAttribute="top" secondItem="2LL-Lb-9mb" secondAttribute="bottom" constant="20" id="GtD-ho-nnL"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="kSw-f3-Rp0" secondAttribute="bottom" constant="20" id="SDB-tM-O3S"/>
                     <constraint firstItem="kSw-f3-Rp0" firstAttribute="trailing" secondItem="UBB-WX-F5H" secondAttribute="trailing" id="YX8-Kx-g4D"/>
                     <constraint firstItem="2LL-Lb-9mb" firstAttribute="top" secondItem="jMf-GB-Eiw" secondAttribute="top" constant="17" id="cG1-qu-s9b"/>
                     <constraint firstItem="UBB-WX-F5H" firstAttribute="top" secondItem="2LL-Lb-9mb" secondAttribute="top" id="e91-6I-2yn"/>
