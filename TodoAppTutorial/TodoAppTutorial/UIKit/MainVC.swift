@@ -12,6 +12,7 @@ import SwiftUI
 class MainVC: UIViewController {
     
     @IBOutlet weak var myTableView: UITableView!
+    @IBOutlet weak var pageInfoLabel: UILabel!
     
     var todos: [Todo] = []
     
@@ -22,14 +23,24 @@ class MainVC: UIViewController {
         print(#fileID, #function, #line, "- ")
         self.view.backgroundColor = .systemYellow
         
+        // 테이블 뷰 설정
         self.myTableView.register(TodoCell.uinib, forCellReuseIdentifier: TodoCell.reuseIdentifier)
         self.myTableView.dataSource = self
+        
+        self.myTableView.delegate = self
         
         // 뷰모델 이벤트 받기: 뷰와 뷰모델 바인딩
         self.todosVM.notifyTodosChanged = { updatedTodos in
             self.todos = updatedTodos
             DispatchQueue.main.async {
                 self.myTableView.reloadData()
+            }
+        }
+        
+        // 페이지 변경 이벤트
+        self.todosVM.notifyCurrentPageChanged = { currentPage in
+            DispatchQueue.main.async {
+                self.pageInfoLabel.text = "페이지: \(currentPage)"
             }
         }
         
@@ -49,7 +60,8 @@ class MainVC: UIViewController {
 //            }
 //        })
         
-    }
+        
+    }// viewDidLoad
 }
 
 // 1. 갯수
@@ -75,6 +87,23 @@ extension MainVC : UITableViewDataSource {
         
     }
 }
+
+extension MainVC: UITableViewDelegate {
+    
+    /// - Parameter scrollView
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print(#fileID, #function, #line, "- ")
+        let height = scrollView.frame.size.height
+        let contentYOffset = scrollView.contentOffset.y
+        let distanceFromBottom = scrollView.contentSize.height - contentYOffset
+
+        if distanceFromBottom - 150 < height {
+            print("바닥이다")
+            self.todosVM.fetchMore()
+        }
+    }
+}
+
 
 extension MainVC {
     
